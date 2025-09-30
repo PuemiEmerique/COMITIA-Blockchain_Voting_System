@@ -415,11 +415,11 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Form submission
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        handleLogin();
-    });
+    // Form submission - let it submit normally
+    // document.getElementById('loginForm').addEventListener('submit', function(e) {
+    //     e.preventDefault();
+    //     handleLogin();
+    // });
 
     // Biometric login
     document.getElementById('biometricLoginBtn').addEventListener('click', function() {

@@ -521,11 +521,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('password_confirm');
     
-    // Form submission
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        handleRegistration();
-    });
+    // Form submission - let it submit normally
+    // form.addEventListener('submit', function(e) {
+    //     e.preventDefault();
+    //     handleRegistration();
+    // });
     
     // Password strength checker
     passwordInput.addEventListener('input', function() {
@@ -664,6 +664,53 @@ async function handleRegistration() {
     } finally {
         showLoading(false);
     }
+}
+
+function nextStep() {
+    if (currentStep < totalSteps) {
+        // Hide current step
+        document.getElementById(`step${currentStep}`).classList.remove('active');
+        document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.remove('active');
+        
+        // Show next step
+        currentStep++;
+        document.getElementById(`step${currentStep}`).classList.add('active');
+        document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.add('active');
+        
+        // Update progress steps
+        updateProgressSteps();
+    }
+}
+
+function prevStep() {
+    if (currentStep > 1) {
+        // Hide current step
+        document.getElementById(`step${currentStep}`).classList.remove('active');
+        document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.remove('active');
+        
+        // Show previous step
+        currentStep--;
+        document.getElementById(`step${currentStep}`).classList.add('active');
+        document.querySelector(`.progress-step[data-step="${currentStep}"]`).classList.add('active');
+        
+        // Update progress steps
+        updateProgressSteps();
+    }
+}
+
+function updateProgressSteps() {
+    const progressSteps = document.querySelectorAll('.progress-step');
+    progressSteps.forEach((step, index) => {
+        const stepNumber = index + 1;
+        if (stepNumber < currentStep) {
+            step.classList.add('completed');
+        } else if (stepNumber === currentStep) {
+            step.classList.add('active');
+            step.classList.remove('completed');
+        } else {
+            step.classList.remove('active', 'completed');
+        }
+    });
 }
 
 function validateForm() {

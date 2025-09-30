@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security settings
 SECRET_KEY = 'django-insecure-change-me-in-production-comitia-blockchain-voting'
 DEBUG = True
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:60955']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:60955', 'testserver']
 
 # Application definition
 DJANGO_APPS = [
@@ -32,12 +32,11 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     'accounts',
-    # Temporarily disabled until apps are created
-    # 'elections',
-    # 'voting',
-    # 'blockchain',
-    # 'biometrics',
-    # 'campaigns',
+    'elections',
+    'voting',
+    'blockchain',
+    'biometrics',
+    'campaigns',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

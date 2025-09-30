@@ -1,144 +1,436 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block extra_css %}
+<style>
+.commission-dashboard {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.dashboard-header {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.commission-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+    backdrop-filter: blur(10px);
+}
+
+.commission-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.commission-card .card-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 20px 20px 0 0;
+    padding: 1.5rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.admin-btn {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    border: none;
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.admin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.admin-btn.primary {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+.admin-btn.success {
+    background: linear-gradient(135deg, #10b981, #34d399);
+}
+
+.admin-btn.warning {
+    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+
+.admin-btn.danger {
+    background: linear-gradient(135deg, #ef4444, #f87171);
+}
+
+.system-status {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.activity-timeline {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    transition: background-color 0.3s ease;
+}
+
+.activity-item:hover {
+    background-color: #f8fafc;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.activity-election { background: #dbeafe; color: #1e40af; }
+.activity-user { background: #dcfce7; color: #166534; }
+.activity-security { background: #fef3c7; color: #92400e; }
+.activity-system { background: #f3e8ff; color: #7c3aed; }
+
+.quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.quick-stat {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .commission-dashboard {
+        padding: 1rem 0;
+    }
+    
+    .dashboard-header {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <div class="dashboard-header">
-                <h1><i class="fas fa-crown"></i> Electoral Commission Dashboard</h1>
-                <p class="lead">Welcome, {{ user.get_full_name }}! Oversee the entire election process and system administration.</p>
+<div class="commission-dashboard">
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="fas fa-crown"></i> Electoral Commission Dashboard</h1>
+                    <p class="lead">Welcome, {{ user.get_full_name }}! Oversee the entire election process and system administration.</p>
+                </div>
+                <div class="col-md-4 text-md-right">
+                    <span class="badge bg-warning px-3 py-2">
+                        <i class="fas fa-crown"></i> Commission Authority
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-poll"></i>
+                </div>
+                <h3>{{ system_stats.total_elections|default:"0" }}</h3>
+                <p>Total Elections</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-play-circle"></i>
+                </div>
+                <h3>{{ system_stats.active_elections|default:"0" }}</h3>
+                <p>Active Elections</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>{{ system_stats.total_voters|default:"0" }}</h3>
+                <p>Registered Voters</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h3>{{ system_stats.pending_candidates|default:"0" }}</h3>
+                <p>Pending Candidates</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-vote-yea"></i>
+                </div>
+                <h3>{{ system_stats.total_votes_cast|default:"0" }}</h3>
+                <p>Total Votes Cast</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- System Status & Control -->
+            <div class="col-lg-8 mb-4">
+                <div class="commission-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-tachometer-alt"></i> System Status & Control Center</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="system-status">
+                            <h6><i class="fas fa-server"></i> System Health Monitor</h6>
+                            <div class="quick-stats">
+                                <div class="quick-stat">
+                                    <i class="fas fa-database text-success"></i>
+                                    <p class="small mb-0">Database</p>
+                                    <strong class="text-success">Online</strong>
+                                </div>
+                                <div class="quick-stat">
+                                    <i class="fas fa-link text-success"></i>
+                                    <p class="small mb-0">Blockchain</p>
+                                    <strong class="text-success">Connected</strong>
+                                </div>
+                                <div class="quick-stat">
+                                    <i class="fas fa-shield-alt text-success"></i>
+                                    <p class="small mb-0">Security</p>
+                                    <strong class="text-success">Active</strong>
+                                </div>
+                                <div class="quick-stat">
+                                    <i class="fas fa-users text-warning"></i>
+                                    <p class="small mb-0">Active Users</p>
+                                    <strong class="text-warning">127</strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-poll"></i> Election Management</h6>
+                                <button class="admin-btn primary" onclick="alert('Election creation coming soon!')">
+                                    <i class="fas fa-plus"></i> Create New Election
+                                </button>
+                                <button class="admin-btn" onclick="alert('Election management coming soon!')">
+                                    <i class="fas fa-cog"></i> Manage Elections
+                                </button>
+                                <button class="admin-btn success" onclick="alert('Results dashboard coming soon!')">
+                                    <i class="fas fa-chart-bar"></i> View Results
+                                </button>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-users-cog"></i> User Management</h6>
+                                <button class="admin-btn warning" onclick="alert('Candidate approval coming soon!')">
+                                    <i class="fas fa-user-check"></i> Approve Candidates
+                                </button>
+                                <button class="admin-btn danger" onclick="alert('User role management coming soon!')">
+                                    <i class="fas fa-users-cog"></i> Manage User Roles
+                                </button>
+                                <button class="admin-btn" onclick="alert('System backup coming soon!')">
+                                    <i class="fas fa-database"></i> System Backup
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <div class="row">
-                <!-- System Overview Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-tachometer-alt"></i> System Overview</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row text-center">
-                                <div class="col-6">
-                                    <h4>{{ system_stats.total_elections }}</h4>
-                                    <small class="text-muted">Total Elections</small>
-                                </div>
-                                <div class="col-6">
-                                    <h4>{{ system_stats.active_elections }}</h4>
-                                    <small class="text-muted">Active Elections</small>
-                                </div>
-                            </div>
-                            <div class="row text-center mt-3">
-                                <div class="col-6">
-                                    <h4>{{ system_stats.total_voters }}</h4>
-                                    <small class="text-muted">Registered Voters</small>
-                                </div>
-                                <div class="col-6">
-                                    <h4>{{ system_stats.total_votes_cast }}</h4>
-                                    <small class="text-muted">Total Votes Cast</small>
-                                </div>
-                            </div>
-                        </div>
+            <div class="col-lg-4 mb-4">
+                <div class="commission-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="admin-btn primary" onclick="alert('Emergency protocols coming soon!')">
+                            <i class="fas fa-exclamation-triangle"></i> Emergency Protocols
+                        </button>
+                        <button class="admin-btn warning" onclick="alert('System maintenance coming soon!')">
+                            <i class="fas fa-tools"></i> System Maintenance
+                        </button>
+                        <button class="admin-btn success" onclick="alert('Audit reports coming soon!')">
+                            <i class="fas fa-clipboard-check"></i> Generate Audit Report
+                        </button>
+                        <button class="admin-btn" onclick="alert('Security scan coming soon!')">
+                            <i class="fas fa-shield-alt"></i> Security Scan
+                        </button>
+                        <button class="admin-btn danger" onclick="alert('System alerts coming soon!')">
+                            <i class="fas fa-bell"></i> System Alerts
+                        </button>
                     </div>
                 </div>
-                
-                <!-- Election Management Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-plus-circle"></i> Election Management</h5>
-                        </div>
-                        <div class="card-body">
-                            <p>Create and manage elections, positions, and voting periods.</p>
-                            <div class="d-flex flex-column gap-2">
-                                <button class="btn btn-primary" disabled>
-                                    <i class="fas fa-plus"></i> Create New Election (Coming Soon)
-                                </button>
-                                <button class="btn btn-info" disabled>
-                                    <i class="fas fa-cog"></i> Manage Elections (Coming Soon)
-                                </button>
-                                <button class="btn btn-secondary" disabled>
-                                    <i class="fas fa-chart-bar"></i> View Results (Coming Soon)
-                                </button>
-                            </div>
-                        </div>
+            </div>
+        </div>
+
+        <!-- System Activities & Monitoring -->
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="commission-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-history"></i> Recent System Activities</h5>
+                        <span class="badge bg-light text-dark">Live Monitor</span>
                     </div>
-                </div>
-                
-                <!-- Candidate Approvals Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-user-check"></i> Candidate Approvals</h5>
-                            <span class="badge badge-warning">{{ system_stats.pending_candidates }} Pending</span>
-                        </div>
-                        <div class="card-body">
-                            <p>Review and approve candidate applications for upcoming elections.</p>
-                            {% if system_stats.pending_candidates > 0 %}
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i>
-                                    You have {{ system_stats.pending_candidates }} candidate applications awaiting review.
-                                </div>
-                            {% else %}
-                                <p class="text-muted">No pending candidate applications at the moment.</p>
-                            {% endif %}
-                            <button class="btn btn-warning" disabled>
-                                <i class="fas fa-clipboard-list"></i> Review Candidates (Coming Soon)
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- System Administration Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-cogs"></i> System Administration</h5>
-                        </div>
-                        <div class="card-body">
-                            <p>Manage system settings, user roles, and security configurations.</p>
-                            <div class="d-flex flex-column gap-2">
-                                <button class="btn btn-danger" disabled>
-                                    <i class="fas fa-users-cog"></i> Manage User Roles (Coming Soon)
-                                </button>
-                                <button class="btn btn-warning" disabled>
-                                    <i class="fas fa-shield-alt"></i> Security Settings (Coming Soon)
-                                </button>
-                                <button class="btn btn-info" disabled>
-                                    <i class="fas fa-database"></i> System Backup (Coming Soon)
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Recent Activities Card -->
-                <div class="col-md-12 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-history"></i> Recent System Activities</h5>
-                        </div>
-                        <div class="card-body">
+                    <div class="card-body">
+                        <div class="activity-timeline">
                             {% if recent_activities %}
-                                <div class="activity-list">
-                                    {% for activity in recent_activities %}
-                                        <div class="activity-item mb-3">
-                                            <div class="d-flex justify-content-between">
-                                                <div>
-                                                    <h6>{{ activity.description }}</h6>
-                                                    <p class="small text-muted">{{ activity.user.get_full_name }} - {{ activity.created_at|date:"M d, Y g:i A" }}</p>
-                                                </div>
-                                                <span class="badge badge-{{ activity.activity_type }}">{{ activity.get_activity_type_display }}</span>
-                                            </div>
+                                {% for activity in recent_activities %}
+                                    <div class="activity-item">
+                                        <div class="activity-icon activity-{{ activity.activity_type|default:'system' }}">
+                                            <i class="fas fa-{{ activity.icon|default:'cog' }}"></i>
                                         </div>
-                                    {% endfor %}
-                                </div>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">{{ activity.description|default:'System Activity' }}</h6>
+                                            <p class="small text-muted mb-0">{{ activity.user.get_full_name|default:'System' }} - {{ activity.created_at|default:'Just now'|date:'M d, Y g:i A' }}</p>
+                                        </div>
+                                        <span class="badge bg-primary">{{ activity.get_activity_type_display|default:'System' }}</span>
+                                    </div>
+                                {% endfor %}
                             {% else %}
-                                <p>No recent system activities to display.</p>
-                                <p class="small text-muted">System activities and audit logs will appear here.</p>
+                                <!-- Mock data for demonstration -->
+                                <div class="activity-item">
+                                    <div class="activity-icon activity-election">
+                                        <i class="fas fa-poll"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">New election created: City Council 2025</h6>
+                                        <p class="small text-muted mb-0">Commissioner Smith - Dec 1, 2025 2:30 PM</p>
+                                    </div>
+                                    <span class="badge bg-primary">Election</span>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon activity-user">
+                                        <i class="fas fa-user-check"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Candidate application approved: Jane Doe</h6>
+                                        <p class="small text-muted mb-0">Commissioner Johnson - Dec 1, 2025 1:15 PM</p>
+                                    </div>
+                                    <span class="badge bg-success">Approval</span>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon activity-security">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Security audit completed successfully</h6>
+                                        <p class="small text-muted mb-0">System - Dec 1, 2025 12:00 PM</p>
+                                    </div>
+                                    <span class="badge bg-warning">Security</span>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon activity-system">
+                                        <i class="fas fa-database"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Database backup completed</h6>
+                                        <p class="small text-muted mb-0">System - Dec 1, 2025 11:30 AM</p>
+                                    </div>
+                                    <span class="badge bg-info">System</span>
+                                </div>
                             {% endif %}
                         </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 mb-4">
+                <div class="commission-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-crown"></i> Commission Profile</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class="fas fa-crown fa-2x text-muted"></i>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Commissioner Name</label>
+                            <p class="h6">{{ user.get_full_name }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Role</label>
+                            <p class="h6">{{ user.get_user_type_display }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Commission ID</label>
+                            <p class="h6">COM-{{ user.id|stringformat:"05d" }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Position</label>
+                            <p class="h6">{{ profile.position|default:"Chief Commissioner" }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Jurisdiction</label>
+                            <p class="h6">{{ profile.jurisdiction|default:"National" }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Term Started</label>
+                            <p class="h6">{{ profile.appointment_date|default:user.date_joined|date:"F d, Y" }}</p>
+                        </div>
+                        <a href="{% url 'accounts:profile' %}" class="admin-btn">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </a>
                     </div>
                 </div>
             </div>

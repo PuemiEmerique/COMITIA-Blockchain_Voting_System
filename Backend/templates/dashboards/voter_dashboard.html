@@ -1,116 +1,445 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block extra_css %}
+<style>
+.voter-dashboard {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.dashboard-header {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.voter-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    word-wrap: break-word;
+    box-sizing: border-box;
+}
+
+.voter-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.voter-card .card-header {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: white;
+    border: none;
+    border-radius: 20px 20px 0 0;
+    padding: 1.5rem;
+}
+
+.election-card {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.election-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.vote-btn {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    border: none;
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.vote-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.status-eligible {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.blockchain-info {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    word-wrap: break-word;
+    box-sizing: border-box;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.voter-card .card-body {
+    padding: 1.5rem;
+    overflow: hidden;
+    word-wrap: break-word;
+    box-sizing: border-box;
+}
+
+.voting-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 2rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    background: #4facfe;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 3px #4facfe;
+}
+
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 12px;
+    width: 2px;
+    height: calc(100% - 12px);
+    background: #e2e8f0;
+}
+
+.timeline-item:last-child::after {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .voter-dashboard {
+        padding: 1rem 0;
+    }
+    
+    .dashboard-header {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .voter-card .card-body {
+        padding: 1rem;
+    }
+    
+    .stat-item {
+        padding: 1rem;
+        min-height: 100px;
+    }
+    
+    .stats-overview {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .vote-btn {
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <div class="dashboard-header">
-                <h1><i class="fas fa-vote-yea"></i> Voter Dashboard</h1>
-                <p class="lead">Welcome, {{ user.get_full_name }}! Exercise your democratic right to vote.</p>
+<div class="voter-dashboard">
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="fas fa-vote-yea"></i> Voter Dashboard</h1>
+                    <p class="lead">Welcome, {{ user.get_full_name }}! Exercise your democratic right to vote securely.</p>
+                </div>
+                <div class="col-md-4 text-md-right">
+                    {% if can_vote %}
+                        <span class="status-indicator status-eligible">
+                            <i class="fas fa-check-circle me-2"></i> Eligible to Vote
+                        </span>
+                    {% else %}
+                        <span class="status-indicator status-pending">
+                            <i class="fas fa-clock me-2"></i> Verification Pending
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-overview">
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="fas fa-poll-h"></i>
+                </div>
+                <h3>{{ active_elections|length }}</h3>
+                <p>Active Elections</p>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3>{{ voting_history|length }}</h3>
+                <p>Votes Cast</p>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>{% if user.is_biometric_registered %}Yes{% else %}No{% endif %}</h3>
+                <p>Biometric Verified</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Voting Status Card -->
+            <div class="col-lg-8 mb-4">
+                <div class="voter-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-user-check"></i> Voting Status & Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="text-muted">Voter ID</label>
+                                    <p class="h6">VTR-{{ user.id|stringformat:"05d" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Registration Date</label>
+                                    <p class="h6">{{ user.date_joined|date:"F d, Y" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Verification Status</label>
+                                    <p class="h6">{{ user.get_verification_status_display }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="text-muted">Voting Eligibility</label>
+                                    {% if can_vote %}
+                                        <p class="h6 text-success"><i class="fas fa-check-circle"></i> Eligible to Vote</p>
+                                    {% else %}
+                                        <p class="h6 text-warning"><i class="fas fa-exclamation-triangle"></i> Pending Verification</p>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Biometric Status</label>
+                                    {% if user.is_biometric_registered %}
+                                        <p class="h6 text-success"><i class="fas fa-fingerprint"></i> Registered</p>
+                                    {% else %}
+                                        <p class="h6 text-warning"><i class="fas fa-clock"></i> Pending Registration</p>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Last Activity</label>
+                                    <p class="h6">{{ user.last_login|timesince }} ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <div class="row">
-                <!-- Voting Status Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-user-check"></i> Voting Status</h5>
-                            <span class="badge badge-{{ verification_status }}">{{ user.get_verification_status_display }}</span>
-                        </div>
-                        <div class="card-body">
-                            {% if can_vote %}
-                                <p class="text-success"><i class="fas fa-check-circle"></i> You are eligible to vote!</p>
-                                <p><strong>Voter ID:</strong> {{ user.id }}</p>
-                                <p><strong>Registration Date:</strong> {{ user.registration_date|date:"F d, Y" }}</p>
-                            {% else %}
-                                <p class="text-warning"><i class="fas fa-exclamation-triangle"></i> Voting eligibility pending verification.</p>
-                                <p><strong>Status:</strong> {{ user.get_verification_status_display }}</p>
-                            {% endif %}
-                        </div>
+            <div class="col-lg-4 mb-4">
+                <div class="voter-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
                     </div>
-                </div>
-                
-                <!-- Active Elections Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-poll"></i> Active Elections</h5>
-                            <span class="badge badge-primary">{{ active_elections|length }} Available</span>
-                        </div>
-                        <div class="card-body">
-                            {% if active_elections %}
-                                {% for election in active_elections %}
-                                    <div class="election-item mb-3">
-                                        <h6>{{ election.title }}</h6>
-                                        <p class="small text-muted">Voting: {{ election.voting_start_date|date:"M d" }} - {{ election.voting_end_date|date:"M d, Y" }}</p>
-                                        <button class="btn btn-success btn-sm">
-                                            <i class="fas fa-vote-yea"></i> Vote Now
-                                        </button>
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <p>No active elections at the moment.</p>
-                                <button class="btn btn-secondary" disabled>
-                                    <i class="fas fa-clock"></i> No Elections Available
-                                </button>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Voting History Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-history"></i> Voting History</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if voting_history %}
-                                {% for vote in voting_history %}
-                                    <div class="vote-item mb-3">
-                                        <h6>{{ vote.election.title }}</h6>
-                                        <p class="small text-muted">Voted on: {{ vote.created_at|date:"F d, Y g:i A" }}</p>
-                                        <span class="badge badge-success">Verified on Blockchain</span>
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <p>You haven't voted in any elections yet.</p>
-                                <p class="small text-muted">Your voting history will appear here after you cast your first vote.</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Blockchain Verification Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-link"></i> Blockchain Verification</h5>
-                        </div>
-                        <div class="card-body">
-                            <p>Verify your votes on the blockchain for complete transparency.</p>
-                            <div class="blockchain-status">
-                                <p><strong>Ethereum Address:</strong> 
-                                    {% if user.ethereum_address %}
-                                        <code>{{ user.ethereum_address }}</code>
-                                    {% else %}
-                                        <span class="text-muted">Not connected</span>
-                                    {% endif %}
-                                </p>
-                                <p><strong>Biometric Status:</strong> 
-                                    {% if user.is_biometric_registered %}
-                                        <span class="badge badge-success">Registered</span>
-                                    {% else %}
-                                        <span class="badge badge-warning">Pending</span>
-                                    {% endif %}
-                                </p>
-                            </div>
-                            <button class="btn btn-info" disabled>
-                                <i class="fas fa-search"></i> Verify Votes (Coming Soon)
+                    <div class="card-body">
+                        <div class="d-grid gap-3">
+                            <button class="btn btn-primary" onclick="alert('Biometric verification coming soon!')">
+                                <i class="fas fa-fingerprint"></i> Verify Biometrics
+                            </button>
+                            <button class="btn btn-info" onclick="alert('Vote verification coming soon!')">
+                                <i class="fas fa-search"></i> Verify My Votes
+                            </button>
+                            <button class="btn btn-success" onclick="alert('Election notifications coming soon!')">
+                                <i class="fas fa-bell"></i> Election Alerts
                             </button>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Elections Section -->
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="voter-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-poll"></i> Active Elections</h5>
+                        <span class="badge bg-light text-dark">{{ active_elections|length }} Available</span>
+                    </div>
+                    <div class="card-body">
+                        {% if active_elections %}
+                            <div class="row">
+                                {% for election in active_elections %}
+                                    <div class="col-md-6 col-lg-4 mb-3">
+                                        <div class="election-card">
+                                            <h6><i class="fas fa-vote-yea"></i> {{ election.title }}</h6>
+                                            <p class="mb-2">{{ election.description|truncatewords:10 }}</p>
+                                            <p class="small mb-3">
+                                                <i class="fas fa-calendar"></i> 
+                                                {{ election.voting_start_date|date:"M d" }} - {{ election.voting_end_date|date:"M d, Y" }}
+                                            </p>
+                                            <button class="vote-btn w-100">
+                                                <i class="fas fa-vote-yea"></i> Vote Now
+                                            </button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No Active Elections</h5>
+                                <p class="text-muted">There are currently no elections available for voting. Check back later!</p>
+                                <button class="btn btn-outline-primary" onclick="alert('You will be notified when new elections are available!')">
+                                    <i class="fas fa-bell"></i> Notify Me
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voting History & Blockchain Section -->
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="voter-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-history"></i> Voting History</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if voting_history %}
+                            <div class="voting-timeline">
+                                {% for vote in voting_history %}
+                                    <div class="timeline-item">
+                                        <h6>{{ vote.election.title }}</h6>
+                                        <p class="text-muted mb-1">Voted on: {{ vote.created_at|date:"F d, Y g:i A" }}</p>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-success me-2">
+                                                <i class="fas fa-check"></i> Verified on Blockchain
+                                            </span>
+                                            <small class="text-muted">TX: {{ vote.transaction_hash|default:"0x1234...abcd" }}</small>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-vote-yea fa-3x text-muted mb-3"></i>
+                                <h6 class="text-muted">No Voting History Yet</h6>
+                                <p class="text-muted">Your voting history will appear here after you cast your first vote.</p>
+                                <p class="small text-muted">All votes are securely recorded on the blockchain for transparency.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 mb-4">
+                <div class="voter-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-link"></i> Blockchain Info</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="blockchain-info">
+                            <h6><i class="fas fa-ethereum"></i> Ethereum Integration</h6>
+                            <p class="mb-2">Your votes are secured on the blockchain</p>
+                            <div class="mb-3">
+                                <small class="text-light">Wallet Address:</small>
+                                {% if user.ethereum_address %}
+                                    <p class="font-monospace small">{{ user.ethereum_address|truncatechars:20 }}...</p>
+                                {% else %}
+                                    <p class="small">Not connected</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <h6>Security Features</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> End-to-end encryption</li>
+                                <li><i class="fas fa-check text-success"></i> Biometric authentication</li>
+                                <li><i class="fas fa-check text-success"></i> Blockchain verification</li>
+                                <li><i class="fas fa-check text-success"></i> Anonymous voting</li>
+                            </ul>
+                        </div>
+                        
+                        <button class="btn btn-outline-primary w-100 mt-3" onclick="alert('Blockchain explorer coming soon!')">
+                            <i class="fas fa-external-link-alt"></i> View on Blockchain
+                        </button>
                     </div>
                 </div>
             </div>

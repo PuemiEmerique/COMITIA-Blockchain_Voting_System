@@ -1,108 +1,442 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block extra_css %}
+<style>
+.candidate-dashboard {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.dashboard-header {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.campaign-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    word-wrap: break-word;
+    box-sizing: border-box;
+}
+
+.campaign-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.campaign-card .card-header {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: white;
+    border: none;
+    border-radius: 20px 20px 0 0;
+    padding: 1.5rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    word-wrap: break-word;
+    box-sizing: border-box;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.campaign-card .card-body {
+    padding: 1.5rem;
+    overflow: hidden;
+    word-wrap: break-word;
+    box-sizing: border-box;
+}
+
+.campaign-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.campaign-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.campaign-btn.success {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+.campaign-btn.warning {
+    background: linear-gradient(135deg, #ffecd2, #fcb69f);
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.status-approved { background: #d1fae5; color: #065f46; }
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-rejected { background: #fee2e2; color: #991b1b; }
+
+.campaign-progress {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.progress-bar-custom {
+    height: 10px;
+    border-radius: 10px;
+    background: #e2e8f0;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.campaign-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 2rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    background: #f093fb;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 3px #f093fb;
+}
+
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 12px;
+    width: 2px;
+    height: calc(100% - 12px);
+    background: #e2e8f0;
+}
+
+.timeline-item:last-child::after {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .candidate-dashboard {
+        padding: 1rem 0;
+    }
+    
+    .dashboard-header {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .campaign-card .card-body {
+        padding: 1rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+        min-height: 100px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .campaign-btn {
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <div class="dashboard-header">
-                <h1><i class="fas fa-user-tie"></i> Candidate Dashboard</h1>
-                <p class="lead">Welcome, {{ user.get_full_name }}! Manage your campaign and connect with voters.</p>
+<div class="candidate-dashboard">
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="fas fa-user-tie"></i> Candidate Dashboard</h1>
+                    <p class="lead">Welcome, {{ user.get_full_name }}! Manage your campaign and connect with voters.</p>
+                </div>
+                <div class="col-md-4 text-md-right">
+                    <span class="status-badge status-{{ user.verification_status }}">
+                        {{ user.get_verification_status_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaign Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>{{ campaign_stats.total_supporters|default:"0" }}</h3>
+                <p>Total Supporters</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3>{{ campaign_stats.events_scheduled|default:"0" }}</h3>
+                <p>Events Scheduled</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-share-alt"></i>
+                </div>
+                <h3>{{ campaign_stats.social_media_reach|default:"0" }}</h3>
+                <p>Social Media Reach</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <h3>${{ campaign_stats.total_donations|default:"0" }}</h3>
+                <p>Campaign Funds</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Campaign Status & Progress -->
+            <div class="col-lg-8 mb-4">
+                <div class="campaign-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-flag"></i> Campaign Status & Progress</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="text-muted">Candidate ID</label>
+                                    <p class="h6">CND-{{ user.id|stringformat:"05d" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Registration Date</label>
+                                    <p class="h6">{{ user.date_joined|date:"F d, Y" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Campaign Status</label>
+                                    {% if user.verification_status == 'approved' %}
+                                        <p class="h6 text-success"><i class="fas fa-check-circle"></i> Approved & Active</p>
+                                    {% else %}
+                                        <p class="h6 text-warning"><i class="fas fa-clock"></i> Awaiting Approval</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="campaign-progress">
+                                    <h6>Campaign Progress</h6>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Profile Completion</small>
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-fill" style="width: 75%"></div>
+                                        </div>
+                                        <small class="text-muted">75% Complete</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Campaign Setup</small>
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-fill" style="width: 45%"></div>
+                                        </div>
+                                        <small class="text-muted">45% Complete</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <div class="row">
-                <!-- Campaign Status Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-flag"></i> Campaign Status</h5>
-                            <span class="badge badge-{{ verification_status }}">{{ user.get_verification_status_display }}</span>
-                        </div>
-                        <div class="card-body">
-                            <p><strong>Candidate ID:</strong> {{ user.id }}</p>
-                            <p><strong>Registration Date:</strong> {{ user.registration_date|date:"F d, Y" }}</p>
-                            <p><strong>Status:</strong> {{ user.get_verification_status_display }}</p>
-                            {% if user.verification_status == 'approved' %}
-                                <p class="text-success"><i class="fas fa-check-circle"></i> Your candidacy is approved!</p>
-                            {% else %}
-                                <p class="text-warning"><i class="fas fa-clock"></i> Awaiting approval from Electoral Commission.</p>
-                            {% endif %}
+            <div class="col-lg-4 mb-4">
+                <div class="campaign-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="campaign-btn success" onclick="alert('Event scheduling coming soon!')">
+                            <i class="fas fa-calendar-plus"></i> Schedule Event
+                        </button>
+                        <button class="campaign-btn" onclick="alert('Social media management coming soon!')">
+                            <i class="fas fa-share-alt"></i> Social Media
+                        </button>
+                        <button class="campaign-btn warning" onclick="alert('Newsletter system coming soon!')">
+                            <i class="fas fa-envelope"></i> Send Newsletter
+                        </button>
+                        <button class="campaign-btn" onclick="alert('Analytics dashboard coming soon!')">
+                            <i class="fas fa-chart-bar"></i> View Analytics
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaign Management Section -->
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="campaign-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bullhorn"></i> Campaign Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-calendar-alt"></i> Upcoming Events</h6>
+                                <div class="campaign-timeline">
+                                    <div class="timeline-item">
+                                        <h6>Town Hall Meeting</h6>
+                                        <p class="text-muted mb-1">December 15, 2025 at 7:00 PM</p>
+                                        <small class="text-muted">Community Center - Main Hall</small>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <h6>Campaign Rally</h6>
+                                        <p class="text-muted mb-1">December 20, 2025 at 6:00 PM</p>
+                                        <small class="text-muted">City Park - Central Stage</small>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <h6>Debate Preparation</h6>
+                                        <p class="text-muted mb-1">December 22, 2025 at 2:00 PM</p>
+                                        <small class="text-muted">Campaign Headquarters</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-chart-line"></i> Campaign Metrics</h6>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Supporter Growth</span>
+                                        <span class="text-success">+12%</span>
+                                    </div>
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-fill" style="width: 68%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Social Engagement</span>
+                                        <span class="text-success">+8%</span>
+                                    </div>
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-fill" style="width: 54%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Campaign Funding</span>
+                                        <span class="text-warning">+3%</span>
+                                    </div>
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-fill" style="width: 32%"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Campaign Statistics Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-chart-line"></i> Campaign Statistics</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row text-center">
-                                <div class="col-6">
-                                    <h4>{{ campaign_stats.total_supporters }}</h4>
-                                    <small class="text-muted">Total Supporters</small>
-                                </div>
-                                <div class="col-6">
-                                    <h4>{{ campaign_stats.events_scheduled }}</h4>
-                                    <small class="text-muted">Events Scheduled</small>
-                                </div>
-                            </div>
-                            <div class="row text-center mt-3">
-                                <div class="col-6">
-                                    <h4>{{ campaign_stats.social_media_reach }}</h4>
-                                    <small class="text-muted">Social Media Reach</small>
-                                </div>
-                                <div class="col-6">
-                                    <h4>{{ campaign_stats.total_donations }}</h4>
-                                    <small class="text-muted">Total Donations</small>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary mt-3" disabled>
-                                <i class="fas fa-chart-bar"></i> View Analytics (Coming Soon)
-                            </button>
-                        </div>
+            </div>
+            
+            <div class="col-lg-4 mb-4">
+                <div class="campaign-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-user-circle"></i> Candidate Profile</h5>
                     </div>
-                </div>
-                
-                <!-- Profile Information Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-user-circle"></i> Candidate Profile</h5>
-                        </div>
-                        <div class="card-body">
-                            <p><strong>Name:</strong> {{ user.get_full_name }}</p>
-                            <p><strong>User Type:</strong> {{ user.get_user_type_display }}</p>
-                            <p><strong>Bio:</strong> {{ user.bio|default:"No bio provided" }}</p>
-                            <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">
-                                <i class="fas fa-edit"></i> Edit Profile
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Campaign Management Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-bullhorn"></i> Campaign Management</h5>
-                        </div>
-                        <div class="card-body">
-                            <p>Manage your campaign activities and voter outreach.</p>
-                            <div class="d-flex flex-column gap-2">
-                                <button class="btn btn-success" disabled>
-                                    <i class="fas fa-calendar-plus"></i> Schedule Event (Coming Soon)
-                                </button>
-                                <button class="btn btn-info" disabled>
-                                    <i class="fas fa-share-alt"></i> Social Media (Coming Soon)
-                                </button>
-                                <button class="btn btn-warning" disabled>
-                                    <i class="fas fa-envelope"></i> Send Newsletter (Coming Soon)
-                                </button>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class="fas fa-user fa-2x text-muted"></i>
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Full Name</label>
+                            <p class="h6">{{ user.get_full_name }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Role</label>
+                            <p class="h6">{{ user.get_user_type_display }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Bio</label>
+                            <p class="small">{{ user.bio|default:"Complete your profile to help voters learn more about you and your campaign platform." }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Campaign Slogan</label>
+                            <p class="small font-italic">"Building a Better Tomorrow Together"</p>
+                        </div>
+                        <a href="{% url 'accounts:profile' %}" class="campaign-btn">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </a>
                     </div>
                 </div>
             </div>

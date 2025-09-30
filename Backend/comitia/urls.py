@@ -30,11 +30,11 @@ urlpatterns = [
     
     # App URLs
     path('accounts/', include('accounts.urls')),
-    # path('elections/', include('elections.urls')),
-    # path('voting/', include('voting.urls')),
-    # path('blockchain/', include('blockchain.urls')),
-    # path('biometrics/', include('biometrics.urls')),
-    # path('campaigns/', include('campaigns.urls')),
+    path('elections/', include('elections.urls')),
+    path('voting/', include('voting.urls')),
+    path('blockchain/', include('blockchain.urls')),
+    path('biometrics/', include('biometrics.urls')),
+    path('campaigns/', include('campaigns.urls')),
     
     # API Documentation (temporarily disabled)
     path('api/docs/', views.api_documentation, name='api_documentation'),

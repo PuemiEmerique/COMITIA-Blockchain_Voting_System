@@ -61,8 +61,8 @@ def register_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         email = request.POST.get('email')
-        password1 = request.POST.get('password1')
-        password2 = request.POST.get('password2')
+        password1 = request.POST.get('password')
+        password2 = request.POST.get('password_confirm')
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         
@@ -89,7 +89,7 @@ def register_view(request):
                     )
                     
                     # Create citizen profile
-                    CitizenProfile.objects.create(user=user)
+                    CitizenProfile.objects.get_or_create(user=user)
                     
                     # Log them in
                     login(request, user)
@@ -160,9 +160,9 @@ def citizen_dashboard_view(request):
     
     # Get or create citizen profile
     try:
-        citizen_profile = user.citizenprofile
+        citizen_profile = user.citizen_profile
     except:
-        citizen_profile = CitizenProfile.objects.create(user=user)
+        citizen_profile, created = CitizenProfile.objects.get_or_create(user=user)
     
     context = {
         'title': 'Citizen Dashboard - COMITIA',
@@ -184,9 +184,9 @@ def voter_dashboard_view(request):
     
     # Get or create voter profile
     try:
-        voter_profile = user.voterprofile
+        voter_profile = user.voter_profile
     except:
-        voter_profile = VoterProfile.objects.create(user=user)
+        voter_profile, created = VoterProfile.objects.get_or_create(user=user)
     
     # Mock data for elections (will be replaced with real data later)
     active_elections = []
@@ -214,9 +214,9 @@ def candidate_dashboard_view(request):
     
     # Get or create candidate profile
     try:
-        candidate_profile = user.candidateprofile
+        candidate_profile = user.candidate_profile
     except:
-        candidate_profile = CandidateProfile.objects.create(user=user)
+        candidate_profile, created = CandidateProfile.objects.get_or_create(user=user)
     
     # Mock data for campaigns (will be replaced with real data later)
     campaigns = []
@@ -252,9 +252,9 @@ def voter_official_dashboard_view(request):
     
     # Get or create voter official profile
     try:
-        official_profile = user.voterofficialprofile
+        official_profile = user.voter_official_profile
     except:
-        official_profile = VoterOfficialProfile.objects.create(user=user)
+        official_profile, created = VoterOfficialProfile.objects.get_or_create(user=user)
     
     # Mock data for pending registrations (will be replaced with real data later)
     pending_registrations = []
@@ -289,9 +289,9 @@ def electoral_commission_dashboard_view(request):
     
     # Get or create electoral commission profile
     try:
-        commission_profile = user.electoralcommissionprofile
+        commission_profile = user.electoral_commission_profile
     except:
-        commission_profile = ElectoralCommissionProfile.objects.create(user=user)
+        commission_profile, created = ElectoralCommissionProfile.objects.get_or_create(user=user)
     
     # Mock data for system overview (will be replaced with real data later)
     system_stats = {

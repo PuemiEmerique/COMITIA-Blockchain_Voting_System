@@ -1,91 +1,340 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block extra_css %}
+<style>
+.dashboard-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.dashboard-header {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    word-wrap: break-word;
+    box-sizing: border-box;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.feature-card .card-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 20px 20px 0 0;
+    padding: 1.5rem;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-approved { background: #d1fae5; color: #065f46; }
+.status-rejected { background: #fee2e2; color: #991b1b; }
+
+.action-btn {
+    padding: 0.8rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary-custom {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-warning-custom {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: white;
+}
+
+.btn-info-custom {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: white;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    word-wrap: break-word;
+    box-sizing: border-box;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.feature-card .card-body {
+    padding: 1.5rem;
+    overflow: hidden;
+    word-wrap: break-word;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem 0;
+    }
+    
+    .dashboard-header {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .feature-card .card-body {
+        padding: 1.5rem;
+        overflow: hidden;
+        word-wrap: break-word;
+        box-sizing: border-box;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+        min-height: 100px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .action-btn {
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <div class="dashboard-header">
-                <h1><i class="fas fa-users"></i> Citizen Dashboard</h1>
-                <p class="lead">Welcome, {{ user.get_full_name }}! Manage your civic participation.</p>
+<div class="dashboard-container">
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="fas fa-users"></i> Citizen Dashboard</h1>
+                    <p class="lead">Welcome back, {{ user.get_full_name }}! Manage your civic participation and stay engaged.</p>
+                </div>
+                <div class="col-md-4 text-md-right">
+                    <span class="status-badge status-{{ user.verification_status }}">
+                        {{ user.get_verification_status_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>0</h3>
+                <p>Elections Participated</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <h3>{{ user.get_verification_status_display }}</h3>
+                <p>Verification Status</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-clock"></i>
+                </div>
+                <h3>{{ user.date_joined|timesince }}</h3>
+                <p>Member Since</p>
+            </div>
+        </div>
+            
+        <div class="row">
+            <!-- Voter Registration Card -->
+            <div class="col-lg-6 mb-4">
+                <div class="feature-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-user-plus"></i> Voter Registration</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if can_apply_voter %}
+                            <h6 class="text-success mb-3">✓ Eligible to Apply</h6>
+                            <p>Join the democratic process by registering as a voter. You'll be able to participate in all elections and referendums.</p>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">Requirements Checklist:</small>
+                                <ul class="list-unstyled mt-2">
+                                    <li><i class="fas fa-check text-success"></i> Valid citizenship</li>
+                                    <li><i class="fas fa-check text-success"></i> Identity verification</li>
+                                    <li><i class="fas fa-clock text-warning"></i> Biometric registration</li>
+                                </ul>
+                            </div>
+                            
+                            <a href="{% url 'accounts:role_transition' %}" class="action-btn btn-primary-custom">
+                                <i class="fas fa-user-plus"></i> Apply for Voter Registration
+                            </a>
+                        {% else %}
+                            <h6 class="text-info mb-3">Application Status</h6>
+                            <p>Your voter registration application is being processed.</p>
+                            <div class="alert alert-info">
+                                <strong>Status:</strong> {{ user.get_verification_status_display }}
+                                <br><small>You will be notified once your application is reviewed.</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
             
-            <div class="row">
-                <!-- Voter Registration Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-user-plus"></i> Voter Registration</h5>
-                            <span class="badge badge-{{ user.verification_status }}">{{ user.get_verification_status_display }}</span>
-                        </div>
-                        <div class="card-body">
-                            {% if can_apply_voter %}
-                                <p>Apply to become a registered voter and participate in elections.</p>
-                                <a href="{% url 'accounts:role_transition' %}" class="btn btn-primary">
-                                    <i class="fas fa-user-plus"></i> Apply for Voter Registration
-                                </a>
-                            {% else %}
-                                <p>You have already applied for voter registration or are already a voter.</p>
-                                <p><strong>Status:</strong> {{ user.get_verification_status_display }}</p>
-                            {% endif %}
-                        </div>
+            <!-- Candidate Application Card -->
+            <div class="col-lg-6 mb-4">
+                <div class="feature-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-user-tie"></i> Candidate Application</h5>
                     </div>
-                </div>
-                
-                <!-- Candidate Application Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-user-tie"></i> Candidate Application</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if can_apply_candidate %}
-                                <p>Apply to run for office in upcoming elections.</p>
-                                <a href="{% url 'accounts:role_transition' %}" class="btn btn-warning">
-                                    <i class="fas fa-user-tie"></i> Apply for Candidacy
-                                </a>
-                            {% else %}
-                                <p>Candidate applications are not available for your current status.</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Profile Information Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-user-circle"></i> Profile Information</h5>
-                        </div>
-                        <div class="card-body">
-                            <p><strong>User Type:</strong> {{ user.get_user_type_display }}</p>
-                            <p><strong>Registration Date:</strong> {{ user.registration_date|date:"F d, Y" }}</p>
-                            <p><strong>Verification Status:</strong> {{ user.get_verification_status_display }}</p>
-                            <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">
-                                <i class="fas fa-edit"></i> Edit Profile
+                    <div class="card-body">
+                        {% if can_apply_candidate %}
+                            <h6 class="text-success mb-3">✓ Eligible to Apply</h6>
+                            <p>Ready to serve your community? Apply to run for office in upcoming elections and make a difference.</p>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">Requirements:</small>
+                                <ul class="list-unstyled mt-2">
+                                    <li><i class="fas fa-check text-success"></i> Citizen status</li>
+                                    <li><i class="fas fa-check text-success"></i> Valid identification</li>
+                                    <li><i class="fas fa-clock text-warning"></i> Background verification</li>
+                                </ul>
+                            </div>
+                            
+                            <a href="{% url 'accounts:role_transition' %}" class="action-btn btn-warning-custom">
+                                <i class="fas fa-user-tie"></i> Apply for Candidacy
                             </a>
-                        </div>
+                        {% else %}
+                            <h6 class="text-muted mb-3">Not Available</h6>
+                            <p>Candidate applications are currently not available for your status.</p>
+                            <small class="text-muted">Complete voter registration first to become eligible.</small>
+                        {% endif %}
                     </div>
                 </div>
-                
-                <!-- Civic Education Card -->
-                <div class="col-md-6 mb-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-graduation-cap"></i> Civic Education</h5>
+            </div>
+        </div>
+
+        <!-- Profile & Education Section -->
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="feature-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-user-circle"></i> Profile Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="text-muted">Full Name</label>
+                                    <p class="h6">{{ user.get_full_name }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Email Address</label>
+                                    <p class="h6">{{ user.email }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Username</label>
+                                    <p class="h6">{{ user.username }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="text-muted">User Type</label>
+                                    <p class="h6">{{ user.get_user_type_display }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Member Since</label>
+                                    <p class="h6">{{ user.date_joined|date:"F d, Y" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Last Activity</label>
+                                    <p class="h6">{{ user.last_login|timesince }} ago</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <p>Learn about the voting process and your civic rights.</p>
-                            <ul class="list-unstyled">
-                                <li><i class="fas fa-check text-success"></i> Understanding Your Voting Rights</li>
-                                <li><i class="fas fa-check text-success"></i> How Blockchain Voting Works</li>
-                                <li><i class="fas fa-check text-success"></i> Biometric Authentication Process</li>
+                        <a href="{% url 'accounts:profile' %}" class="action-btn btn-info-custom">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 mb-4">
+                <div class="feature-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-graduation-cap"></i> Civic Education</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-3">Learn about the voting process and your civic rights.</p>
+                        <div class="mb-3">
+                            <small class="text-muted">Available Courses:</small>
+                            <ul class="list-unstyled mt-2">
+                                <li><i class="fas fa-play-circle text-primary"></i> Understanding Your Voting Rights</li>
+                                <li><i class="fas fa-play-circle text-primary"></i> How Blockchain Voting Works</li>
+                                <li><i class="fas fa-play-circle text-primary"></i> Biometric Authentication Process</li>
+                                <li><i class="fas fa-play-circle text-primary"></i> Election Security & Transparency</li>
                             </ul>
-                            <button class="btn btn-info" disabled>
-                                <i class="fas fa-book-open"></i> Start Learning (Coming Soon)
-                            </button>
                         </div>
+                        <button class="action-btn btn-info-custom" onclick="alert('Civic education portal coming soon!')">
+                            <i class="fas fa-book-open"></i> Start Learning
+                        </button>
                     </div>
                 </div>
             </div>
