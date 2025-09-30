@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="dashboard-header">
+                <h1><i class="fas fa-user-cog"></i> Voter Official Dashboard</h1>
+                <p class="lead">Welcome, {{ user.get_full_name }}! Manage voter registrations and biometric verification.</p>
+            </div>
+            
+            <div class="row">
+                <!-- Registration Statistics Card -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-pie"></i> Registration Statistics</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <h4>{{ registration_stats.pending_count }}</h4>
+                                    <small class="text-muted">Pending Applications</small>
+                                </div>
+                                <div class="col-6">
+                                    <h4>{{ registration_stats.approved_today }}</h4>
+                                    <small class="text-muted">Approved Today</small>
+                                </div>
+                            </div>
+                            <div class="row text-center mt-3">
+                                <div class="col-6">
+                                    <h4>{{ registration_stats.rejected_today }}</h4>
+                                    <small class="text-muted">Rejected Today</small>
+                                </div>
+                                <div class="col-6">
+                                    <h4>{{ registration_stats.total_processed }}</h4>
+                                    <small class="text-muted">Total Processed</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pending Registrations Card -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-clock"></i> Pending Registrations</h5>
+                            <span class="badge badge-warning">{{ pending_registrations|length }} Pending</span>
+                        </div>
+                        <div class="card-body">
+                            {% if pending_registrations %}
+                                {% for registration in pending_registrations %}
+                                    <div class="registration-item mb-3">
+                                        <h6>{{ registration.user.get_full_name }}</h6>
+                                        <p class="small text-muted">Applied: {{ registration.created_at|date:"M d, Y" }}</p>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-success" disabled>
+                                                <i class="fas fa-check"></i> Approve
+                                            </button>
+                                            <button class="btn btn-danger" disabled>
+                                                <i class="fas fa-times"></i> Reject
+                                            </button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p>No pending registrations at the moment.</p>
+                                <p class="small text-muted">New applications will appear here for review.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Biometric Verification Card -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-fingerprint"></i> Biometric Verification</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Manage biometric data capture and verification for voter registration.</p>
+                            <div class="biometric-tools">
+                                <button class="btn btn-primary mb-2" disabled>
+                                    <i class="fas fa-camera"></i> Capture Face Data (Coming Soon)
+                                </button>
+                                <button class="btn btn-info mb-2" disabled>
+                                    <i class="fas fa-fingerprint"></i> Capture Fingerprint (Coming Soon)
+                                </button>
+                                <button class="btn btn-secondary mb-2" disabled>
+                                    <i class="fas fa-search"></i> Verify Identity (Coming Soon)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Information Card -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-user-circle"></i> Official Profile</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Name:</strong> {{ user.get_full_name }}</p>
+                            <p><strong>Role:</strong> {{ user.get_user_type_display }}</p>
+                            <p><strong>Station:</strong> {{ profile.assigned_station|default:"Not Assigned" }}</p>
+                            <p><strong>Jurisdiction:</strong> {{ profile.jurisdiction|default:"Not Assigned" }}</p>
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

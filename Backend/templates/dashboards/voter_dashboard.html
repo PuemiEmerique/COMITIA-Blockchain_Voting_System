@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="dashboard-header">
+                <h1><i class="fas fa-vote-yea"></i> Voter Dashboard</h1>
+                <p class="lead">Welcome, {{ user.get_full_name }}! Exercise your democratic right to vote.</p>
+            </div>
+            
+            <div class="row">
+                <!-- Voting Status Card -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-user-check"></i> Voting Status</h5>
+                            <span class="badge badge-{{ verification_status }}">{{ user.get_verification_status_display }}</span>
+                        </div>
+                        <div class="card-body">
+                            {% if can_vote %}
+                                <p class="text-success"><i class="fas fa-check-circle"></i> You are eligible to vote!</p>
+                                <p><strong>Voter ID:</strong> {{ user.id }}</p>
+                                <p><strong>Registration Date:</strong> {{ user.registration_date|date:"F d, Y" }}</p>
+                            {% else %}
+                                <p class="text-warning"><i class="fas fa-exclamation-triangle"></i> Voting eligibility pending verification.</p>
+                                <p><strong>Status:</strong> {{ user.get_verification_status_display }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Active Elections Card -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-poll"></i> Active Elections</h5>
+                            <span class="badge badge-primary">{{ active_elections|length }} Available</span>
+                        </div>
+                        <div class="card-body">
+                            {% if active_elections %}
+                                {% for election in active_elections %}
+                                    <div class="election-item mb-3">
+                                        <h6>{{ election.title }}</h6>
+                                        <p class="small text-muted">Voting: {{ election.voting_start_date|date:"M d" }} - {{ election.voting_end_date|date:"M d, Y" }}</p>
+                                        <button class="btn btn-success btn-sm">
+                                            <i class="fas fa-vote-yea"></i> Vote Now
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p>No active elections at the moment.</p>
+                                <button class="btn btn-secondary" disabled>
+                                    <i class="fas fa-clock"></i> No Elections Available
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Voting History Card -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-history"></i> Voting History</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if voting_history %}
+                                {% for vote in voting_history %}
+                                    <div class="vote-item mb-3">
+                                        <h6>{{ vote.election.title }}</h6>
+                                        <p class="small text-muted">Voted on: {{ vote.created_at|date:"F d, Y g:i A" }}</p>
+                                        <span class="badge badge-success">Verified on Blockchain</span>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p>You haven't voted in any elections yet.</p>
+                                <p class="small text-muted">Your voting history will appear here after you cast your first vote.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Blockchain Verification Card -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-link"></i> Blockchain Verification</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Verify your votes on the blockchain for complete transparency.</p>
+                            <div class="blockchain-status">
+                                <p><strong>Ethereum Address:</strong> 
+                                    {% if user.ethereum_address %}
+                                        <code>{{ user.ethereum_address }}</code>
+                                    {% else %}
+                                        <span class="text-muted">Not connected</span>
+                                    {% endif %}
+                                </p>
+                                <p><strong>Biometric Status:</strong> 
+                                    {% if user.is_biometric_registered %}
+                                        <span class="badge badge-success">Registered</span>
+                                    {% else %}
+                                        <span class="badge badge-warning">Pending</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <button class="btn btn-info" disabled>
+                                <i class="fas fa-search"></i> Verify Votes (Coming Soon)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

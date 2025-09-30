@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Comitia - Secure Voting Platform</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header" id="mainHeader">
+    <div class="logo">
+      <h1>Comitia</h1>
+    </div>
+    <nav class="nav" id="publicNav">
+      <ul class="nav-list">
+        <li><a href="#info">General Info</a></li>
+        <li><a href="#news">News</a></li>
+        <li><a href="#blogs">Blogs</a></li>
+        <li><button id="openRegister" class="btn small">Register</button></li>
+        <li><button id="openLogin" class="btn small secondary">Login</button></li>
+      </ul>
+    </nav>
+    
+    <!-- Authenticated User Navigation -->
+    <nav class="nav" id="userNav" style="display: none;">
+      <ul class="nav-list">
+        <li><span id="userWelcome" class="user-welcome"></span></li>
+        <li><button id="userDashboard" class="btn small">Dashboard</button></li>
+        <li><button id="userLogout" class="btn small secondary">Logout</button></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section (Public) -->
+  <section class="hero" id="heroSection">
+    <div class="hero-text">
+      <h2>Your Voice, Your Power</h2>
+      <p>Vote securely with blockchain, biometrics, and AI-driven transparency.</p>
+      <div class="buttons">
+        <button id="heroRegister" class="btn">Register Now</button>
+        <button id="heroLogin" class="btn secondary">Log In</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard Container -->
+  <div id="dashboardContainer" class="dashboard-container" style="display: none;">
+    
+    <!-- Citizen Dashboard -->
+    <div id="citizenDashboard" class="dashboard citizen-dashboard" style="display: none;">
+      <div class="dashboard-header">
+        <h2><i class="fas fa-user"></i> Citizen Dashboard</h2>
+        <p>Welcome to your citizen portal. Apply for voter registration or candidacy.</p>
+      </div>
+      
+      <div class="dashboard-grid">
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-vote-yea"></i></div>
+          <h3>Voter Registration</h3>
+          <p>Apply to become a registered voter</p>
+          <div class="card-status" id="voterEnrollmentStatus">
+            <span class="status-badge pending">Not Applied</span>
+          </div>
+          <button class="btn card-btn" id="applyVoterBtn">Apply for Voter Registration</button>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-user-tie"></i></div>
+          <h3>Candidacy Application</h3>
+          <p>Apply to become a candidate in elections</p>
+          <button class="btn card-btn" id="applyCandidateBtn">Apply for Candidacy</button>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
+          <h3>Active Elections</h3>
+          <p>View current and upcoming elections</p>
+          <div id="activeElectionsList" class="elections-list"></div>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-graduation-cap"></i></div>
+          <h3>Civic Education</h3>
+          <p>Learn about the voting process and your rights</p>
+          <button class="btn card-btn secondary">Learn More</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Voter Dashboard -->
+    <div id="voterDashboard" class="dashboard voter-dashboard" style="display: none;">
+      <div class="dashboard-header">
+        <h2><i class="fas fa-check-circle"></i> Voter Dashboard</h2>
+        <p>You are a registered voter. Participate in elections and verify your votes.</p>
+      </div>
+      
+      <div class="dashboard-grid">
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-ballot-check"></i></div>
+          <h3>Cast Your Vote</h3>
+          <p>Participate in active elections</p>
+          <div id="voterElectionsList" class="elections-list"></div>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-shield-check"></i></div>
+          <h3>Verify Your Votes</h3>
+          <p>Verify your votes on the blockchain</p>
+          <button class="btn card-btn" id="verifyVotesBtn">Verify Votes</button>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-id-card"></i></div>
+          <h3>Voter Information</h3>
+          <div class="voter-info">
+            <p><strong>Voter ID:</strong> <span id="voterIdDisplay"></span></p>
+            <p><strong>Polling Station:</strong> <span id="pollingStationDisplay"></span></p>
+            <p><strong>Constituency:</strong> <span id="constituencyDisplay"></span></p>
+          </div>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-fingerprint"></i></div>
+          <h3>Biometric Status</h3>
+          <div class="biometric-status" id="biometricStatus">
+            <span class="status-badge verified">Verified</span>
+          </div>
+          <button class="btn card-btn secondary" id="updateBiometricBtn">Update Biometric</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Candidate Dashboard -->
+    <div id="candidateDashboard" class="dashboard candidate-dashboard" style="display: none;">
+      <div class="dashboard-header">
+        <h2><i class="fas fa-star"></i> Candidate Dashboard</h2>
+        <p>Manage your campaigns and track your performance.</p>
+      </div>
+      
+      <div class="dashboard-grid">
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-bullhorn"></i></div>
+          <h3>My Campaigns</h3>
+          <p>Manage your election campaigns</p>
+          <div id="candidateCampaignsList" class="campaigns-list"></div>
+          <button class="btn card-btn" id="createCampaignBtn">Create Campaign</button>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+          <h3>Performance Analytics</h3>
+          <p>Track your campaign performance</p>
+          <div class="analytics-summary">
+            <div class="stat-item">
+              <span class="stat-number" id="totalVotesReceived">0</span>
+              <span class="stat-label">Votes Received</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="campaignReach">0</span>
+              <span class="stat-label">Campaign Reach</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-file-alt"></i></div>
+          <h3>Application Status</h3>
+          <div class="application-status" id="candidateApplicationStatus">
+            <span class="status-badge approved">Approved</span>
+          </div>
+          <p>Your candidacy applications and their status</p>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-users"></i></div>
+          <h3>Voter Engagement</h3>
+          <p>Interact with voters and receive feedback</p>
+          <button class="btn card-btn" id="voterFeedbackBtn">View Feedback</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Voter Official Dashboard -->
+    <div id="voterOfficialDashboard" class="dashboard voter-official-dashboard" style="display: none;">
+      <div class="dashboard-header">
+        <h2><i class="fas fa-user-check"></i> Voter Official Dashboard</h2>
+        <p>Manage voter registrations and biometric data capture.</p>
+      </div>
+      
+      <div class="dashboard-grid">
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-user-plus"></i></div>
+          <h3>Pending Registrations</h3>
+          <p>Review and approve voter applications</p>
+          <div class="pending-count">
+            <span class="count-number" id="pendingRegistrationsCount">0</span>
+            <span class="count-label">Pending Applications</span>
+          </div>
+          <button class="btn card-btn" id="reviewRegistrationsBtn">Review Applications</button>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-camera"></i></div>
+          <h3>Biometric Capture</h3>
+          <p>Capture biometric data for new voters</p>
+          <button class="btn card-btn" id="captureBiometricBtn">Start Biometric Capture</button>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
+          <h3>Registration Statistics</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-number" id="totalRegistered">0</span>
+              <span class="stat-label">Total Registered</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="todayRegistrations">0</span>
+              <span class="stat-label">Today's Registrations</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-map-marker-alt"></i></div>
+          <h3>My Assignment</h3>
+          <div class="assignment-info">
+            <p><strong>Region:</strong> <span id="assignedRegion"></span></p>
+            <p><strong>Center:</strong> <span id="registrationCenter"></span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Electoral Commission Dashboard -->
+    <div id="electoralCommissionDashboard" class="dashboard electoral-commission-dashboard" style="display: none;">
+      <div class="dashboard-header">
+        <h2><i class="fas fa-crown"></i> Electoral Commission Dashboard</h2>
+        <p>Oversee the entire election process and system administration.</p>
+      </div>
+      
+      <div class="dashboard-grid">
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-plus-circle"></i></div>
+          <h3>Create Election</h3>
+          <p>Set up new elections and configure positions</p>
+          <button class="btn card-btn" id="createElectionBtn">Create New Election</button>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-tasks"></i></div>
+          <h3>Manage Elections</h3>
+          <p>Oversee active and upcoming elections</p>
+          <div id="commissionElectionsList" class="elections-list"></div>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-user-cog"></i></div>
+          <h3>Candidate Approvals</h3>
+          <p>Review and approve candidate applications</p>
+          <div class="pending-count">
+            <span class="count-number" id="pendingCandidatesCount">0</span>
+            <span class="count-label">Pending Candidates</span>
+          </div>
+          <button class="btn card-btn" id="reviewCandidatesBtn">Review Candidates</button>
+        </div>
+        
+        <div class="dashboard-card">
+          <div name="card-icon"><i class="fas fa-users-cog"></i></div>
+          <h3>Manage Officials</h3>
+          <p>Appoint and manage voter officials</p>
+          <button class="btn card-btn" id="manageOfficialsBtn">Manage Officials</button>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
+          <h3>System Analytics</h3>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-number" id="totalElections">0</span>
+              <span class="stat-label">Total Elections</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="totalVoters">0</span>
+              <span class="stat-label">Registered Voters</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="totalCandidates">0</span>
+              <span class="stat-label">Active Candidates</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number" id="systemUptime">99.9%</span>
+              <span class="stat-label">System Uptime</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="dashboard-card">
+          <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+          <h3>Security & Audit</h3>
+          <p>Monitor system security and audit logs</p>
+          <button class="btn card-btn secondary" id="securityAuditBtn">View Audit Logs</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Overlay -->
+  <div id="modalOverlay" class="modal-overlay"></div>
+
+  <!-- Register Modal -->
+  <div id="registerModal" class="modal">
+    <div class="modal-content">
+      <span class="close" data-close="registerModal">&times;</span>
+      <div class="form-bg">
+        <form id="registerForm">
+          <h3>Create Your Account</h3>
+          <label>Username <input type="text" id="regUsername" required></label>
+          <label>Email <input type="email" id="regEmail" required></label>
+          <label>First Name <input type="text" id="regFirstName" required></label>
+          <label>Last Name <input type="text" id="regLastName" required></label>
+          <label>Phone Number <input type="tel" id="regPhone"></label>
+          <label>National ID <input type="text" id="regNationalId" required></label>
+          <label>Date of Birth <input type="date" id="regDateOfBirth" required></label>
+          <label>Address <textarea id="regAddress" rows="3"></textarea></label>
+          <label>Password <input type="password" id="regPassword" required></label>
+          <label>Confirm Password <input type="password" id="regConfirm" required></label>
+          <button type="submit" class="btn">Register as Citizen</button>
+          <div id="registerStatus" class="status"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close" data-close="loginModal">&times;</span>
+      <div class="form-bg">
+        <form id="loginForm">
+          <h3>Welcome Back</h3>
+          <label>Username <input type="text" id="loginUsername" required></label>
+          <label>Password <input type="password" id="loginPassword" required></label>
+          <label class="remember">
+            <input type="checkbox" id="loginRemember"> Remember me
+          </label>
+          <button type="submit" class="btn">Log In</button>
+          <div id="loginStatus" class="status"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Biometric Authentication Modal -->
+  <div id="biometricModal" class="modal">
+    <div class="modal-content">
+      <span class="close" data-close="biometricModal">&times;</span>
+      <div class="biometric-container">
+        <h3>Biometric Authentication</h3>
+        <div class="camera-container">
+          <video id="biometricVideo" autoplay muted></video>
+          <canvas id="biometricCanvas" style="display: none;"></canvas>
+        </div>
+        <div class="biometric-controls">
+          <button id="startBiometricBtn" class="btn">Start Face Recognition</button>
+          <button id="captureBiometricBtn" class="btn secondary" style="display: none;">Capture</button>
+        </div>
+        <div id="biometricStatus" class="status"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Voting Modal -->
+  <div id="votingModal" class="modal large-modal">
+    <div class="modal-content">
+      <span class="close" data-close="votingModal">&times;</span>
+      <div class="voting-container">
+        <h3>Cast Your Vote</h3>
+        <div id="ballotContainer" class="ballot-container">
+          <!-- Ballot will be loaded here -->
+        </div>
+        <div class="voting-controls">
+          <button id="submitVoteBtn" class="btn" disabled>Submit Vote</button>
+          <button id="cancelVoteBtn" class="btn secondary">Cancel</button>
+        </div>
+        <div id="votingStatus" class="status"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/face-api.js/0.22.2/face-api.min.js"></script>
+  <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+  <script src="api.js"></script>
+  <script src="biometric.js"></script>
+  <script src="blockchain.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

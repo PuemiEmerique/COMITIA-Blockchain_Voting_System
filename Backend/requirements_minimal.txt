@@ -1,0 +1,23 @@
+# Core Django packages
+Django==4.2.7
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+
+# Authentication & Security
+djangorestframework-simplejwt==5.3.0
+cryptography==41.0.7
+
+# API Documentation
+drf-yasg==1.21.7
+
+# Environment Management
+python-decouple==3.8
+
+# Utilities
+requests==2.31.0
+
+# Development Tools
+django-extensions==3.2.3
+
+# File Upload & Media
+Pillow==10.1.0

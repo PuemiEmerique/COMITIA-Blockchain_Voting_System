@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="dashboard-header">
+                <h1><i class="fas fa-arrow-up"></i> Role Transition</h1>
+                <p class="lead">Upgrade your account to access additional features</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-user-cog"></i> Current Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="current-role">
+                                <h6>Current Role: <span class="badge badge-primary">{{ user.get_user_type_display }}</span></h6>
+                                <p class="text-muted">
+                                    {% if user.user_type == 'citizen' %}
+                                        As a citizen, you can view public information and apply for voter registration or candidacy.
+                                    {% elif user.user_type == 'voter' %}
+                                        As a registered voter, you can participate in elections and apply for candidacy.
+                                    {% elif user.user_type == 'candidate' %}
+                                        As a candidate, you can manage your campaign and participate in elections.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if available_roles %}
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5><i class="fas fa-plus-circle"></i> Available Role Transitions</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="{% url 'accounts:role_transition' %}">
+                                {% csrf_token %}
+                                
+                                {% for role in available_roles %}
+                                <div class="role-transition-option">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="new_role" id="role_{{ role.role }}" value="{{ role.role }}">
+                                        <label class="form-check-label" for="role_{{ role.role }}">
+                                            <strong>{{ role.name }}</strong>
+                                        </label>
+                                    </div>
+                                    <p class="text-muted ml-4">{{ role.description }}</p>
+                                    
+                                    {% if role.role == 'voter' %}
+                                    <div class="alert alert-info ml-4">
+                                        <i class="fas fa-info-circle"></i>
+                                        <strong>Requirements:</strong> You will need to visit a Voter Official for biometric verification and identity confirmation.
+                                    </div>
+                                    {% elif role.role == 'candidate' %}
+                                    <div class="alert alert-warning ml-4">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <strong>Requirements:</strong> Your application will be reviewed by the Electoral Commission. Additional documentation may be required.
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                                
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane"></i> Submit Application
+                                    </button>
+                                    <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left"></i> Back to Profile
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="card mt-3">
+                        <div class="card-body text-center">
+                            <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                            <h5>No Role Transitions Available</h5>
+                            <p class="text-muted">You have reached the highest available role or no transitions are currently available.</p>
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-primary">
+                                <i class="fas fa-arrow-left"></i> Back to Profile
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-info-circle"></i> Role Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="role-info">
+                                <h6><i class="fas fa-users"></i> Citizen</h6>
+                                <p class="small text-muted">Basic access to public information and ability to apply for other roles.</p>
+                            </div>
+                            
+                            <div class="role-info">
+                                <h6><i class="fas fa-vote-yea"></i> Voter</h6>
+                                <p class="small text-muted">Can participate in elections, view results, and verify votes on blockchain.</p>
+                            </div>
+                            
+                            <div class="role-info">
+                                <h6><i class="fas fa-user-tie"></i> Candidate</h6>
+                                <p class="small text-muted">Can run for office, manage campaigns, and access candidate tools.</p>
+                            </div>
+                            
+                            <div class="role-info">
+                                <h6><i class="fas fa-user-cog"></i> Voter Official</h6>
+                                <p class="small text-muted">Manages voter registrations and biometric verification. (By appointment only)</p>
+                            </div>
+                            
+                            <div class="role-info">
+                                <h6><i class="fas fa-crown"></i> Electoral Commission</h6>
+                                <p class="small text-muted">Oversees elections, approves candidates, and manages the system. (By appointment only)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.role-transition-option {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    background-color: #f8f9fa;
+}
+
+.role-transition-option:hover {
+    border-color: #007bff;
+    background-color: #e3f2fd;
+}
+
+.role-info {
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.role-info:last-child {
+    border-bottom: none;
+}
+
+.current-role {
+    padding: 20px;
+    background-color: #e8f5e8;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+}
+</style>
+{% endblock %}

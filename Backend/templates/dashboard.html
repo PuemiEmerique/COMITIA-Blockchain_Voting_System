@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - COMITIA{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="dashboard-header">
+                <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+                <p class="lead">Welcome to your COMITIA dashboard</p>
+            </div>
+            
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                {{ message }}
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-user"></i> User Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Username:</strong> {{ user.username }}</p>
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                            <p><strong>Date Joined:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-cogs"></i> System Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><span class="badge badge-success">Online</span> Django Backend</p>
+                            <p><span class="badge badge-warning">Pending</span> User Apps</p>
+                            <p><span class="badge badge-warning">Pending</span> Blockchain Integration</p>
+                            <p><span class="badge badge-warning">Pending</span> Biometric Authentication</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

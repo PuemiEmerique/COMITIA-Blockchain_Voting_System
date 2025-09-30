@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="dashboard-header">
+                <h1><i class="fas fa-user-tie"></i> Candidate Dashboard</h1>
+                <p class="lead">Welcome, {{ user.get_full_name }}! Manage your campaign and connect with voters.</p>
+            </div>
+            
+            <div class="row">
+                <!-- Campaign Status Card -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-flag"></i> Campaign Status</h5>
+                            <span class="badge badge-{{ verification_status }}">{{ user.get_verification_status_display }}</span>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Candidate ID:</strong> {{ user.id }}</p>
+                            <p><strong>Registration Date:</strong> {{ user.registration_date|date:"F d, Y" }}</p>
+                            <p><strong>Status:</strong> {{ user.get_verification_status_display }}</p>
+                            {% if user.verification_status == 'approved' %}
+                                <p class="text-success"><i class="fas fa-check-circle"></i> Your candidacy is approved!</p>
+                            {% else %}
+                                <p class="text-warning"><i class="fas fa-clock"></i> Awaiting approval from Electoral Commission.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Campaign Statistics Card -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-line"></i> Campaign Statistics</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <h4>{{ campaign_stats.total_supporters }}</h4>
+                                    <small class="text-muted">Total Supporters</small>
+                                </div>
+                                <div class="col-6">
+                                    <h4>{{ campaign_stats.events_scheduled }}</h4>
+                                    <small class="text-muted">Events Scheduled</small>
+                                </div>
+                            </div>
+                            <div class="row text-center mt-3">
+                                <div class="col-6">
+                                    <h4>{{ campaign_stats.social_media_reach }}</h4>
+                                    <small class="text-muted">Social Media Reach</small>
+                                </div>
+                                <div class="col-6">
+                                    <h4>{{ campaign_stats.total_donations }}</h4>
+                                    <small class="text-muted">Total Donations</small>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary mt-3" disabled>
+                                <i class="fas fa-chart-bar"></i> View Analytics (Coming Soon)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile Information Card -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-user-circle"></i> Candidate Profile</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Name:</strong> {{ user.get_full_name }}</p>
+                            <p><strong>User Type:</strong> {{ user.get_user_type_display }}</p>
+                            <p><strong>Bio:</strong> {{ user.bio|default:"No bio provided" }}</p>
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">
+                                <i class="fas fa-edit"></i> Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Campaign Management Card -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-bullhorn"></i> Campaign Management</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Manage your campaign activities and voter outreach.</p>
+                            <div class="d-flex flex-column gap-2">
+                                <button class="btn btn-success" disabled>
+                                    <i class="fas fa-calendar-plus"></i> Schedule Event (Coming Soon)
+                                </button>
+                                <button class="btn btn-info" disabled>
+                                    <i class="fas fa-share-alt"></i> Social Media (Coming Soon)
+                                </button>
+                                <button class="btn btn-warning" disabled>
+                                    <i class="fas fa-envelope"></i> Send Newsletter (Coming Soon)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

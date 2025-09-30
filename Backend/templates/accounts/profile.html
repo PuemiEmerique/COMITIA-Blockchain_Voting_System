@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="dashboard-header">
+                <h1><i class="fas fa-user-circle"></i> User Profile</h1>
+                <p class="lead">Manage your COMITIA account information</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-info-circle"></i> Personal Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Username:</strong> {{ user.username }}</p>
+                                    <p><strong>First Name:</strong> {{ user.first_name }}</p>
+                                    <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+                                    <p><strong>Email:</strong> {{ user.email }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>User Type:</strong> 
+                                        <span class="badge badge-primary">{{ user.get_user_type_display }}</span>
+                                    </p>
+                                    <p><strong>Date Joined:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+                                    <p><strong>Last Login:</strong> 
+                                        {% if user.last_login %}
+                                            {{ user.last_login|date:"F d, Y g:i A" }}
+                                        {% else %}
+                                            Never
+                                        {% endif %}
+                                    </p>
+                                    <p><strong>Account Status:</strong> 
+                                        {% if user.is_active %}
+                                            <span class="badge badge-success">Active</span>
+                                        {% else %}
+                                            <span class="badge badge-danger">Inactive</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <a href="#" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i> Edit Profile
+                                </a>
+                                <a href="#" class="btn btn-secondary">
+                                    <i class="fas fa-key"></i> Change Password
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-shield-alt"></i> Security</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="security-item">
+                                <i class="fas fa-fingerprint text-success"></i>
+                                <span>Biometric Authentication</span>
+                                <small class="text-muted d-block">Not configured</small>
+                            </div>
+                            
+                            <div class="security-item mt-3">
+                                <i class="fas fa-mobile-alt text-warning"></i>
+                                <span>Two-Factor Authentication</span>
+                                <small class="text-muted d-block">Not enabled</small>
+                            </div>
+                            
+                            <div class="security-item mt-3">
+                                <i class="fas fa-key text-info"></i>
+                                <span>Password Strength</span>
+                                <small class="text-muted d-block">Strong</small>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <a href="#" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-cog"></i> Security Settings
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if user.user_type == 'citizen' %}
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5><i class="fas fa-arrow-up"></i> Role Transitions</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted">Upgrade your account to access more features:</p>
+                            
+                            <div class="role-option">
+                                <strong>Voter Registration</strong>
+                                <p class="small text-muted">Apply to become a registered voter</p>
+                                <a href="{% url 'accounts:role_transition' %}" class="btn btn-success btn-sm">
+                                    <i class="fas fa-vote-yea"></i> Apply
+                                </a>
+                            </div>
+                            
+                            <div class="role-option mt-3">
+                                <strong>Candidate Application</strong>
+                                <p class="small text-muted">Apply to run for office</p>
+                                <a href="{% url 'accounts:role_transition' %}" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-user-tie"></i> Apply
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.security-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.security-item:last-child {
+    border-bottom: none;
+}
+
+.role-option {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %}

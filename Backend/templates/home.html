@@ -1,0 +1,513 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}COMITIA - Secure Blockchain Voting{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                <span class="gradient-text">COMITIA</span>
+                <br>Blockchain Voting System
+            </h1>
+            <p class="hero-subtitle">
+                Secure, transparent, and decentralized elections powered by blockchain technology and biometric authentication.
+            </p>
+            <div class="hero-features">
+                <div class="feature-item">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Blockchain Secured</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-fingerprint"></i>
+                    <span>Biometric Auth</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-eye"></i>
+                    <span>Transparent</span>
+                </div>
+            </div>
+            {% if not user.is_authenticated %}
+                <div class="hero-actions">
+                    <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-large">
+                        <i class="fas fa-user-plus"></i>
+                        Get Started
+                    </a>
+                    <a href="{% url 'accounts:login' %}" class="btn btn-secondary btn-large">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login
+                    </a>
+                </div>
+            {% else %}
+                <div class="hero-actions">
+                    <a href="{% url 'accounts:dashboard' %}" class="btn btn-primary btn-large">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Go to Dashboard
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        <div class="hero-visual">
+            <div class="blockchain-animation">
+                <div class="block block-1"></div>
+                <div class="block block-2"></div>
+                <div class="block block-3"></div>
+                <div class="connection-line"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title">Why Choose COMITIA?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-vote-yea"></i>
+                </div>
+                <h3>Secure Voting</h3>
+                <p>Every vote is cryptographically secured and recorded on the blockchain, ensuring immutability and transparency.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-fingerprint"></i>
+                </div>
+                <h3>Biometric Authentication</h3>
+                <p>Advanced facial recognition and fingerprint authentication ensure only authorized voters can participate.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Real-time Results</h3>
+                <p>Live election results with transparent vote counting and instant verification capabilities.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Multi-Role System</h3>
+                <p>Comprehensive system supporting citizens, voters, candidates, officials, and electoral commission.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Mobile Friendly</h3>
+                <p>Responsive design works seamlessly across all devices - desktop, tablet, and mobile.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-audit"></i>
+                </div>
+                <h3>Audit Trail</h3>
+                <p>Complete audit trail with blockchain verification ensures election integrity and accountability.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works-section">
+    <div class="container">
+        <h2 class="section-title">How It Works</h2>
+        <div class="steps-container">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Register & Verify</h3>
+                    <p>Citizens register with biometric authentication and identity verification.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Become Eligible</h3>
+                    <p>Voter officials review and approve registration applications.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Cast Your Vote</h3>
+                    <p>Authenticated voters cast secure votes using biometric verification.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Blockchain Recording</h3>
+                    <p>Votes are encrypted and permanently recorded on the blockchain.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+{% if election_stats %}
+<section class="stats-section">
+    <div class="container">
+        <h2 class="section-title">System Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ election_stats.total_elections }}</div>
+                <div class="stat-label">Total Elections</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ election_stats.total_voters }}</div>
+                <div class="stat-label">Registered Voters</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ election_stats.total_votes }}</div>
+                <div class="stat-label">Votes Cast</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ election_stats.total_candidates }}</div>
+                <div class="stat-label">Candidates</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Active Elections Section -->
+{% if active_elections %}
+<section class="active-elections-section">
+    <div class="container">
+        <h2 class="section-title">Active Elections</h2>
+        <div class="elections-grid">
+            {% for election in active_elections %}
+            <div class="election-card">
+                <div class="election-header">
+                    <h3>{{ election.title }}</h3>
+                    <span class="election-status active">Active</span>
+                </div>
+                <p class="election-description">{{ election.description|truncatewords:20 }}</p>
+                <div class="election-dates">
+                    <div class="date-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Voting: {{ election.voting_start_date|date:"M d" }} - {{ election.voting_end_date|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'elections:detail' election.id %}" class="btn btn-primary">
+                        View Details
+                    </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+{% if not user.is_authenticated %}
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to Participate in Secure Elections?</h2>
+            <p>Join thousands of citizens using COMITIA for transparent and secure voting.</p>
+            <div class="cta-actions">
+                <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-large">
+                    <i class="fas fa-user-plus"></i>
+                    Register Now
+                </a>
+                <a href="#features" class="btn btn-secondary btn-large">
+                    <i class="fas fa-info-circle"></i>
+                    Learn More
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Hero Section Styles */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 100px 0;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+}
+
+.hero-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.gradient-text {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+.hero-features {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+
+.feature-item i {
+    color: #ffd700;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 20px;
+}
+
+.blockchain-animation {
+    position: relative;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.block {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    position: relative;
+    animation: float 3s ease-in-out infinite;
+}
+
+.block-1 { animation-delay: 0s; }
+.block-2 { animation-delay: 1s; margin: 0 20px; }
+.block-3 { animation-delay: 2s; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Features Section */
+.features-section {
+    padding: 100px 0;
+    background: #f8f9fa;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    margin-top: 60px;
+}
+
+.feature-card {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2rem;
+    color: white;
+}
+
+/* How It Works Section */
+.how-it-works-section {
+    padding: 100px 0;
+    background: white;
+}
+
+.steps-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-top: 60px;
+}
+
+.step {
+    text-align: center;
+    position: relative;
+}
+
+.step-number {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 auto 20px;
+}
+
+/* Stats Section */
+.stats-section {
+    padding: 80px 0;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.stat-card {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.stat-label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Elections Section */
+.active-elections-section {
+    padding: 100px 0;
+    background: #f8f9fa;
+}
+
+.elections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 60px;
+}
+
+.election-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.election-card:hover {
+    transform: translateY(-5px);
+}
+
+.election-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.election-status.active {
+    background: #28a745;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+}
+
+/* CTA Section */
+.cta-section {
+    padding: 100px 0;
+    background: linear-gradient(135deg, #764ba2, #667eea);
+    color: white;
+    text-align: center;
+}
+
+.cta-content h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.cta-content p {
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+    opacity: 0.9;
+}
+
+.cta-actions {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-features {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .hero-actions,
+    .cta-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+</style>
+{% endblock %}

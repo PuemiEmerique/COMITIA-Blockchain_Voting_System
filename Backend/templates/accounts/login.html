@@ -1,0 +1,565 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - COMITIA{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-logo">
+                <i class="fas fa-vote-yea"></i>
+            </div>
+            <h2>Welcome Back</h2>
+            <p>Sign in to your COMITIA account</p>
+        </div>
+
+        <form method="post" class="auth-form" id="loginForm">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="username">Username or Email</label>
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" name="username" required 
+                           placeholder="Enter your username or email">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Enter your password">
+                    <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="remember_me">
+                    <span class="checkmark"></span>
+                    Remember me
+                </label>
+                <a href="{% url 'accounts:password_reset' %}" class="forgot-link">
+                    Forgot password?
+                </a>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full">
+                <i class="fas fa-sign-in-alt"></i>
+                Sign In
+            </button>
+
+            <!-- Biometric Login Option -->
+            <div class="divider">
+                <span>or</span>
+            </div>
+
+            <button type="button" class="btn btn-secondary btn-full" id="biometricLoginBtn">
+                <i class="fas fa-fingerprint"></i>
+                Login with Biometrics
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Don't have an account? 
+                <a href="{% url 'accounts:register' %}">Sign up here</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Biometric Authentication Modal -->
+    <div id="biometricModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Biometric Authentication</h3>
+                <button class="modal-close" onclick="closeBiometricModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="biometric-container">
+                    <div class="camera-container">
+                        <video id="biometricVideo" autoplay muted></video>
+                        <canvas id="biometricCanvas" style="display: none;"></canvas>
+                    </div>
+                    <div class="biometric-status" id="biometricStatus">
+                        Position your face in the center and look directly at the camera
+                    </div>
+                    <div class="biometric-actions">
+                        <button type="button" class="btn btn-primary" id="startBiometricBtn">
+                            <i class="fas fa-camera"></i>
+                            Start Camera
+                        </button>
+                        <button type="button" class="btn btn-success" id="authenticateBtn" style="display: none;">
+                            <i class="fas fa-check"></i>
+                            Authenticate
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.auth-container {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.auth-card {
+    background: #f5f7fa;
+    border-radius: 20px;
+    padding: 50px 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.auth-logo {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2rem;
+    color: white;
+}
+
+.auth-header h2 {
+    font-size: 2rem;
+    color: #1e293b;
+    margin-bottom: 10px;
+}
+
+.auth-header p {
+    color: #64748b;
+    font-size: 1rem;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-group i {
+    position: absolute;
+    left: 15px;
+    color: #64748b;
+    z-index: 2;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 15px 15px 15px 45px;
+    border: 2px solid #e1e5e9;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #1e3a8a;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.checkbox-label input {
+    display: none;
+}
+
+.checkmark {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    margin-right: 8px;
+    position: relative;
+}
+
+.checkbox-label input:checked + .checkmark {
+    background: #1e3a8a;
+    border-color: #1e3a8a;
+}
+
+.checkbox-label input:checked + .checkmark::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    color: white;
+    font-size: 10px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.forgot-link {
+    color: #1e3a8a;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+.btn-full {
+    width: 100%;
+    padding: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.divider {
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #ddd;
+}
+
+.divider span {
+    background: #f5f7fa;
+    padding: 0 20px;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.auth-footer a {
+    color: #1e3a8a;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Biometric Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    padding: 20px 30px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #64748b;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.biometric-container {
+    text-align: center;
+}
+
+.camera-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 20px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#biometricVideo {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+}
+
+.biometric-status {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.biometric-status.success {
+    background: #10b98122;
+    color: #10b981;
+}
+
+.biometric-status.error {
+    background: #e11d4822;
+    color: #e11d48;
+}
+
+.biometric-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 30px 20px;
+        margin: 20px;
+    }
+    
+    .form-options {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .biometric-actions {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form submission
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleLogin();
+    });
+
+    // Biometric login
+    document.getElementById('biometricLoginBtn').addEventListener('click', function() {
+        openBiometricModal();
+    });
+
+    // Biometric authentication
+    document.getElementById('startBiometricBtn').addEventListener('click', function() {
+        startBiometricAuth();
+    });
+
+    document.getElementById('authenticateBtn').addEventListener('click', function() {
+        performBiometricAuth();
+    });
+});
+
+async function handleLogin() {
+    const form = document.getElementById('loginForm');
+    const formData = new FormData(form);
+    
+    try {
+        const response = await fetch('{% url "accounts:login" %}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        });
+
+        if (response.ok) {
+            window.location.href = '{% url "accounts:dashboard" %}';
+        } else {
+            const data = await response.json();
+            showError(data.error || 'Login failed');
+        }
+    } catch (error) {
+        showError('Network error. Please try again.');
+    }
+}
+
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const toggle = input.nextElementSibling;
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        toggle.innerHTML = '<i class="fas fa-eye-slash"></i>';
+    } else {
+        input.type = 'password';
+        toggle.innerHTML = '<i class="fas fa-eye"></i>';
+    }
+}
+
+function openBiometricModal() {
+    document.getElementById('biometricModal').style.display = 'block';
+}
+
+function closeBiometricModal() {
+    document.getElementById('biometricModal').style.display = 'none';
+    stopCamera();
+}
+
+async function startBiometricAuth() {
+    try {
+        const video = document.getElementById('biometricVideo');
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        
+        document.getElementById('startBiometricBtn').style.display = 'none';
+        document.getElementById('authenticateBtn').style.display = 'inline-block';
+        
+        updateBiometricStatus('Camera started. Position your face in the center.', 'info');
+    } catch (error) {
+        updateBiometricStatus('Camera access denied or not available.', 'error');
+    }
+}
+
+async function performBiometricAuth() {
+    try {
+        updateBiometricStatus('Authenticating...', 'info');
+        
+        // Simulate biometric authentication
+        // In real implementation, this would capture and verify biometric data
+        setTimeout(() => {
+            updateBiometricStatus('Authentication successful!', 'success');
+            setTimeout(() => {
+                closeBiometricModal();
+                window.location.href = '{% url "accounts:dashboard" %}';
+            }, 2000);
+        }, 2000);
+        
+    } catch (error) {
+        updateBiometricStatus('Authentication failed. Please try again.', 'error');
+    }
+}
+
+function updateBiometricStatus(message, type) {
+    const statusElement = document.getElementById('biometricStatus');
+    statusElement.textContent = message;
+    statusElement.className = `biometric-status ${type}`;
+}
+
+function stopCamera() {
+    const video = document.getElementById('biometricVideo');
+    if (video.srcObject) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+        video.srcObject = null;
+    }
+}
+
+function showError(message) {
+    // Create or update error message
+    let errorDiv = document.querySelector('.error-message');
+    if (!errorDiv) {
+        errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        document.querySelector('.auth-form').prepend(errorDiv);
+    }
+    errorDiv.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i>
+        ${message}
+    `;
+    errorDiv.style.cssText = `
+        background: #e11d4822;
+        color: #e11d48;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    `;
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('biometricModal');
+    if (event.target === modal) {
+        closeBiometricModal();
+    }
+}
+</script>
+{% endblock %}

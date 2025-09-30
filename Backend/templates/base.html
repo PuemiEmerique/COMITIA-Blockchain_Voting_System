@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}COMITIA - Blockchain Voting System{% endblock %}</title>
+    
+    <!-- Load static files -->
+    {% load static %}
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Face-api.js for biometric authentication -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@latest/dist/face-api.min.js"></script>
+    
+    <!-- Ethers.js for blockchain integration -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <i class="fas fa-vote-yea"></i>
+                <span>COMITIA</span>
+            </div>
+            
+            <div class="nav-menu">
+                {% if user.is_authenticated %}
+                    <!-- Authenticated User Navigation -->
+                    <div class="nav-user">
+                        <span class="user-welcome">Welcome, {{ user.first_name }}!</span>
+                        <div class="user-dropdown">
+                            <button class="user-btn">
+                                <i class="fas fa-user"></i>
+                                {{ user.get_full_name }}
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="dropdown-content">
+                                <a href="{% url 'accounts:profile' %}">
+                                    <i class="fas fa-user-circle"></i> Profile
+                                </a>
+                                <a href="{% url 'accounts:dashboard' %}">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="{% url 'accounts:logout' %}">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Public Navigation -->
+                    <div class="nav-links">
+                        <a href="{% url 'home' %}" class="nav-link">Home</a>
+                        <a href="{% url 'accounts:login' %}" class="nav-link">Login</a>
+                        <a href="{% url 'accounts:register' %}" class="nav-link btn-primary">Register</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %}"></i>
+                    {{ message }}
+                    <button class="alert-close" onclick="this.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4>COMITIA</h4>
+                <p>Secure, transparent, and decentralized voting system powered by blockchain technology.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'accounts:dashboard' %}">Dashboard</a></li>
+                    {% else %}
+                        <li><a href="{% url 'accounts:login' %}">Login</a></li>
+                        <li><a href="{% url 'accounts:register' %}">Register</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Security</h4>
+                <ul>
+                    <li><i class="fas fa-shield-alt"></i> Blockchain Secured</li>
+                    <li><i class="fas fa-fingerprint"></i> Biometric Authentication</li>
+                    <li><i class="fas fa-lock"></i> End-to-End Encryption</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 COMITIA. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+    
+    <!-- CSRF Token for AJAX requests -->
+    <script>
+        window.csrfToken = '{{ csrf_token }}';
+    </script>
+</body>
+</html>
