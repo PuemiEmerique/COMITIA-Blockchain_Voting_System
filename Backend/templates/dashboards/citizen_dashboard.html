@@ -4,234 +4,604 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
 <style>
-.dashboard-container {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    padding: 2rem 0;
+:root {
+    --primary-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    --secondary-gradient: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    --success-gradient: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    --warning-gradient: linear-gradient(135deg, #e67e22 0%, #f39c12 100%);
+    --info-gradient: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    --danger-gradient: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+    --border-radius: 12px;
+    --transition: all 0.3s ease;
 }
 
+body {
+    background: var(--primary-gradient);
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.civic-dashboard {
+    padding: 2rem 0;
+    min-height: 100vh;
+}
+
+/* Glass Morphism Cards */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    transition: var(--transition);
+    overflow: hidden;
+    height: 100%;
+}
+
+.glass-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+}
+
+.glass-card-header {
+    background: rgba(52, 152, 219, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 1.5rem;
+    border: none;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.glass-card-body {
+    padding: 2rem;
+    color: white;
+}
+
+/* Modern Header */
 .dashboard-header {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-}
-
-.feature-card {
-    background: rgba(255, 255, 255, 0.95);
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    height: 100%;
-    backdrop-filter: blur(10px);
-    overflow: hidden;
-    word-wrap: break-word;
-    box-sizing: border-box;
-}
-
-.feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-
-.feature-card .card-header {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    border: none;
-    border-radius: 20px 20px 0 0;
-    padding: 1.5rem;
-}
-
-.status-badge {
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-}
-
-.status-pending { background: #fef3c7; color: #92400e; }
-.status-approved { background: #d1fae5; color: #065f46; }
-.status-rejected { background: #fee2e2; color: #991b1b; }
-
-.action-btn {
-    padding: 0.8rem 2rem;
-    border-radius: 50px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    border: none;
-}
-
-.action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-
-.btn-primary-custom {
-    background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
 }
 
-.btn-warning-custom {
-    background: linear-gradient(135deg, #f093fb, #f5576c);
-    color: white;
-}
-
-.btn-info-custom {
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
-    color: white;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.stat-card {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    padding: 1.5rem;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    word-wrap: break-word;
-    box-sizing: border-box;
-    min-height: 120px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.stat-icon {
+.welcome-text {
     font-size: 2.5rem;
-    margin-bottom: 1rem;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-.feature-card .card-body {
-    padding: 1.5rem;
-    overflow: hidden;
-    word-wrap: break-word;
-    box-sizing: border-box;
+.welcome-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0;
 }
 
+/* Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pending {
+    background: rgba(240, 147, 251, 0.2);
+    color: #f093fb;
+    border-color: rgba(240, 147, 251, 0.3);
+}
+
+.status-approved {
+    background: rgba(17, 153, 142, 0.2);
+    color: #38ef7d;
+    border-color: rgba(56, 239, 125, 0.3);
+}
+
+.status-rejected {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+    border-color: rgba(255, 107, 107, 0.3);
+}
+
+/* Modern Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    text-align: center;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #3498db;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-hover);
+}
+
+.stat-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1rem;
+    background: #3498db;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    box-shadow: var(--shadow-light);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Application Cards */
+.application-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    overflow: hidden;
+    height: 100%;
+    position: relative;
+}
+
+.application-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+
+.application-card.voter-card::before {
+    background: #27ae60;
+}
+
+.application-card.candidate-card::before {
+    background: #e67e22;
+}
+
+.application-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.application-header {
+    background: rgba(52, 152, 219, 0.15);
+    padding: 1.5rem;
+    color: white;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.application-body {
+    padding: 2rem;
+    color: white;
+}
+
+.eligibility-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.status-eligible {
+    background: rgba(56, 239, 125, 0.2);
+    color: #38ef7d;
+    border: 1px solid rgba(56, 239, 125, 0.3);
+}
+
+.status-not-available {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Requirements List */
+.requirements-list {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.requirements-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.requirements-list li {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.requirements-list li i {
+    margin-right: 0.75rem;
+    width: 20px;
+}
+
+/* Modern Buttons */
+.btn-modern {
+    background: #3498db;
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-light);
+}
+
+.btn-modern:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    color: white;
+}
+
+.btn-primary-modern {
+    background: #27ae60;
+}
+
+.btn-primary-modern:hover {
+    background: #229954;
+}
+
+.btn-warning-modern {
+    background: #e67e22;
+}
+
+.btn-warning-modern:hover {
+    background: #d35400;
+}
+
+.btn-info-modern {
+    background: #3498db;
+}
+
+.btn-info-modern:hover {
+    background: #2980b9;
+}
+
+/* Course List */
+.course-list {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.course-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0;
+    color: rgba(255, 255, 255, 0.9);
+    transition: var(--transition);
+    border-radius: 10px;
+    padding-left: 1rem;
+    margin: 0.5rem 0;
+}
+
+.course-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(10px);
+}
+
+.course-item i {
+    margin-right: 1rem;
+    color: #4facfe;
+    font-size: 1.2rem;
+}
+
+/* Profile Information */
+.profile-info {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.profile-header {
+    background: rgba(52, 152, 219, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    color: white;
+}
+
+.profile-body {
+    padding: 2rem;
+    color: white;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+
+.info-value {
+    color: white;
+    font-weight: 600;
+}
+
+/* Animations */
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    position: fixed;
+    top: 100px;
+    right: 2rem;
+    z-index: 1000;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 50px;
+    padding: 0.75rem;
+    color: white;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-    .dashboard-container {
+    .civic-dashboard {
         padding: 1rem 0;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
     
     .dashboard-header {
         padding: 1.5rem;
-        margin-bottom: 1rem;
     }
     
-    .feature-card .card-body {
+    .welcome-text {
+        font-size: 2rem;
+    }
+    
+    .glass-card-body,
+    .application-body,
+    .profile-body {
         padding: 1.5rem;
-        overflow: hidden;
-        word-wrap: break-word;
-        box-sizing: border-box;
     }
     
     .stat-card {
-        padding: 1rem;
-        min-height: 100px;
+        padding: 1.5rem;
     }
     
-    .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 0.5rem;
+    .theme-toggle {
+        right: 1rem;
     }
-    
-    .action-btn {
-        padding: 0.6rem 1.5rem;
-        font-size: 0.9rem;
-    }
+}
+
+/* Dark Theme */
+.dark-theme {
+    --primary-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    --glass-bg: rgba(0, 0, 0, 0.3);
+    --glass-border: rgba(255, 255, 255, 0.1);
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
+<!-- Theme Toggle -->
+<div class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+    <i class="fas fa-moon" id="theme-icon"></i>
+</div>
+
+<div class="civic-dashboard">
     <div class="container">
-        <!-- Dashboard Header -->
-        <div class="dashboard-header">
+        <!-- Modern Dashboard Header -->
+        <div class="dashboard-header animate-fade-in">
             <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1><i class="fas fa-users"></i> Citizen Dashboard</h1>
-                    <p class="lead">Welcome back, {{ user.get_full_name }}! Manage your civic participation and stay engaged.</p>
+                <div class="col-lg-8">
+                    <div class="welcome-text">
+                        <i class="fas fa-users me-3"></i>Civic Engagement Hub
+                    </div>
+                    <p class="welcome-subtitle">
+                        Welcome, {{ user.get_full_name }}! Shape your community through democratic participation.
+                    </p>
                 </div>
-                <div class="col-md-4 text-md-right">
-                    <span class="status-badge status-{{ user.verification_status }}">
-                        {{ user.get_verification_status_display }}
-                    </span>
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <div class="status-badge status-{{ user.verification_status|default:'pending' }}">
+                        <i class="fas fa-certificate me-2"></i>
+                        {{ user.get_verification_status_display|default:'Pending Verification' }}
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Stats Overview -->
-        <div class="stats-grid">
+        <!-- Modern Stats Grid -->
+        <div class="stats-grid animate-slide-up">
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="fas fa-calendar-check"></i>
                 </div>
-                <h3>0</h3>
-                <p>Elections Participated</p>
+                <div class="stat-value">0</div>
+                <div class="stat-label">Elections Participated</div>
             </div>
+            
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="fas fa-certificate"></i>
                 </div>
-                <h3>{{ user.get_verification_status_display }}</h3>
-                <p>Verification Status</p>
+                <div class="stat-value">
+                    {% if user.verification_status == 'approved' %}
+                        <i class="fas fa-check text-success"></i>
+                    {% elif user.verification_status == 'rejected' %}
+                        <i class="fas fa-times text-danger"></i>
+                    {% else %}
+                        <i class="fas fa-clock text-warning"></i>
+                    {% endif %}
+                </div>
+                <div class="stat-label">Verification Status</div>
             </div>
+            
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="fas fa-user-clock"></i>
                 </div>
-                <h3>{{ user.date_joined|timesince }}</h3>
-                <p>Member Since</p>
+                <div class="stat-value">{{ user.date_joined|timesince|truncatewords:1 }}</div>
+                <div class="stat-label">Member Since</div>
             </div>
         </div>
-            
-        <div class="row">
+
+        <!-- Application Cards Section -->
+        <div class="row mb-4">
             <!-- Voter Registration Card -->
             <div class="col-lg-6 mb-4">
-                <div class="feature-card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-user-plus"></i> Voter Registration</h5>
+                <div class="application-card voter-card animate-slide-up">
+                    <div class="application-header">
+                        <h5><i class="fas fa-user-plus me-2"></i>Voter Registration</h5>
                     </div>
-                    <div class="card-body">
+                    <div class="application-body">
                         {% if can_apply_voter %}
-                            <h6 class="text-success mb-3">✓ Eligible to Apply</h6>
-                            <p>Join the democratic process by registering as a voter. You'll be able to participate in all elections and referendums.</p>
+                            <div class="eligibility-status status-eligible">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Eligible to Apply
+                            </div>
+                            <p class="mb-3">
+                                Join the democratic process by registering as a voter. Participate in all elections and referendums to make your voice heard.
+                            </p>
                             
-                            <div class="mb-3">
-                                <small class="text-muted">Requirements Checklist:</small>
-                                <ul class="list-unstyled mt-2">
-                                    <li><i class="fas fa-check text-success"></i> Valid citizenship</li>
-                                    <li><i class="fas fa-check text-success"></i> Identity verification</li>
-                                    <li><i class="fas fa-clock text-warning"></i> Biometric registration</li>
+                            <div class="requirements-list">
+                                <h6 class="mb-3">Requirements Checklist</h6>
+                                <ul>
+                                    <li><i class="fas fa-check text-success"></i> Valid citizenship documentation</li>
+                                    <li><i class="fas fa-check text-success"></i> Identity verification completed</li>
+                                    <li><i class="fas fa-clock text-warning"></i> Biometric registration pending</li>
                                 </ul>
                             </div>
                             
-                            <a href="{% url 'accounts:role_transition' %}" class="action-btn btn-primary-custom">
-                                <i class="fas fa-user-plus"></i> Apply for Voter Registration
+                            <a href="{% url 'accounts:role_transition' %}" class="btn-modern btn-primary-modern w-100">
+                                <i class="fas fa-user-plus"></i>
+                                Apply for Voter Registration
                             </a>
                         {% else %}
-                            <h6 class="text-info mb-3">Application Status</h6>
-                            <p>Your voter registration application is being processed.</p>
-                            <div class="alert alert-info">
-                                <strong>Status:</strong> {{ user.get_verification_status_display }}
-                                <br><small>You will be notified once your application is reviewed.</small>
+                            <div class="eligibility-status status-not-available">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Application in Progress
+                            </div>
+                            <p class="mb-3">Your voter registration application is currently being processed by our verification team.</p>
+                            
+                            <div class="requirements-list">
+                                <h6 class="mb-3">Current Status</h6>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Application Status:</span>
+                                    <span class="fw-bold">{{ user.get_verification_status_display }}</span>
+                                </div>
+                                <small class="text-light opacity-75 mt-2 d-block">
+                                    You will receive a notification once your application is reviewed and approved.
+                                </small>
                             </div>
                         {% endif %}
                     </div>
@@ -240,31 +610,48 @@
             
             <!-- Candidate Application Card -->
             <div class="col-lg-6 mb-4">
-                <div class="feature-card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-user-tie"></i> Candidate Application</h5>
+                <div class="application-card candidate-card animate-slide-up">
+                    <div class="application-header">
+                        <h5><i class="fas fa-user-tie me-2"></i>Candidate Application</h5>
                     </div>
-                    <div class="card-body">
+                    <div class="application-body">
                         {% if can_apply_candidate %}
-                            <h6 class="text-success mb-3">✓ Eligible to Apply</h6>
-                            <p>Ready to serve your community? Apply to run for office in upcoming elections and make a difference.</p>
+                            <div class="eligibility-status status-eligible">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Eligible to Apply
+                            </div>
+                            <p class="mb-3">
+                                Ready to serve your community? Apply to run for office in upcoming elections and make a meaningful difference.
+                            </p>
                             
-                            <div class="mb-3">
-                                <small class="text-muted">Requirements:</small>
-                                <ul class="list-unstyled mt-2">
-                                    <li><i class="fas fa-check text-success"></i> Citizen status</li>
-                                    <li><i class="fas fa-check text-success"></i> Valid identification</li>
-                                    <li><i class="fas fa-clock text-warning"></i> Background verification</li>
+                            <div class="requirements-list">
+                                <h6 class="mb-3">Candidacy Requirements</h6>
+                                <ul>
+                                    <li><i class="fas fa-check text-success"></i> Verified citizen status</li>
+                                    <li><i class="fas fa-check text-success"></i> Valid identification documents</li>
+                                    <li><i class="fas fa-clock text-warning"></i> Background verification required</li>
                                 </ul>
                             </div>
                             
-                            <a href="{% url 'accounts:role_transition' %}" class="action-btn btn-warning-custom">
-                                <i class="fas fa-user-tie"></i> Apply for Candidacy
+                            <a href="{% url 'accounts:role_transition' %}" class="btn-modern btn-warning-modern w-100">
+                                <i class="fas fa-user-tie"></i>
+                                Apply for Candidacy
                             </a>
                         {% else %}
-                            <h6 class="text-muted mb-3">Not Available</h6>
-                            <p>Candidate applications are currently not available for your status.</p>
-                            <small class="text-muted">Complete voter registration first to become eligible.</small>
+                            <div class="eligibility-status status-not-available">
+                                <i class="fas fa-lock me-2"></i>
+                                Not Available
+                            </div>
+                            <p class="mb-3">
+                                Candidate applications are currently not available for your verification status.
+                            </p>
+                            
+                            <div class="requirements-list">
+                                <h6 class="mb-3">Prerequisites</h6>
+                                <p class="text-light opacity-75 mb-0">
+                                    Complete voter registration and verification process first to become eligible for candidacy applications.
+                                </p>
+                            </div>
                         {% endif %}
                     </div>
                 </div>
@@ -274,66 +661,83 @@
         <!-- Profile & Education Section -->
         <div class="row">
             <div class="col-lg-8 mb-4">
-                <div class="feature-card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-user-circle"></i> Profile Information</h5>
+                <div class="profile-info animate-slide-up">
+                    <div class="profile-header">
+                        <h5><i class="fas fa-user-circle me-2"></i>Citizen Profile</h5>
                     </div>
-                    <div class="card-body">
+                    <div class="profile-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="text-muted">Full Name</label>
-                                    <p class="h6">{{ user.get_full_name }}</p>
+                                <div class="info-row">
+                                    <span class="info-label">Full Name</span>
+                                    <span class="info-value">{{ user.get_full_name }}</span>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="text-muted">Email Address</label>
-                                    <p class="h6">{{ user.email }}</p>
+                                <div class="info-row">
+                                    <span class="info-label">Email Address</span>
+                                    <span class="info-value">{{ user.email }}</span>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="text-muted">Username</label>
-                                    <p class="h6">{{ user.username }}</p>
+                                <div class="info-row">
+                                    <span class="info-label">Username</span>
+                                    <span class="info-value">{{ user.username }}</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="text-muted">User Type</label>
-                                    <p class="h6">{{ user.get_user_type_display }}</p>
+                                <div class="info-row">
+                                    <span class="info-label">User Type</span>
+                                    <span class="info-value">{{ user.get_user_type_display }}</span>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="text-muted">Member Since</label>
-                                    <p class="h6">{{ user.date_joined|date:"F d, Y" }}</p>
+                                <div class="info-row">
+                                    <span class="info-label">Member Since</span>
+                                    <span class="info-value">{{ user.date_joined|date:"M d, Y" }}</span>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="text-muted">Last Activity</label>
-                                    <p class="h6">{{ user.last_login|timesince }} ago</p>
+                                <div class="info-row">
+                                    <span class="info-label">Last Activity</span>
+                                    <span class="info-value">{{ user.last_login|timesince }} ago</span>
                                 </div>
                             </div>
                         </div>
-                        <a href="{% url 'accounts:profile' %}" class="action-btn btn-info-custom">
-                            <i class="fas fa-edit"></i> Edit Profile
-                        </a>
+                        
+                        <div class="mt-4">
+                            <a href="{% url 'accounts:profile' %}" class="btn-modern btn-info-modern">
+                                <i class="fas fa-edit"></i>
+                                Edit Profile
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
             
             <div class="col-lg-4 mb-4">
-                <div class="feature-card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-graduation-cap"></i> Civic Education</h5>
+                <div class="glass-card animate-slide-up">
+                    <div class="glass-card-header">
+                        <h5><i class="fas fa-graduation-cap me-2"></i>Civic Education</h5>
                     </div>
-                    <div class="card-body">
-                        <p class="mb-3">Learn about the voting process and your civic rights.</p>
-                        <div class="mb-3">
-                            <small class="text-muted">Available Courses:</small>
-                            <ul class="list-unstyled mt-2">
-                                <li><i class="fas fa-play-circle text-primary"></i> Understanding Your Voting Rights</li>
-                                <li><i class="fas fa-play-circle text-primary"></i> How Blockchain Voting Works</li>
-                                <li><i class="fas fa-play-circle text-primary"></i> Biometric Authentication Process</li>
-                                <li><i class="fas fa-play-circle text-primary"></i> Election Security & Transparency</li>
-                            </ul>
+                    <div class="glass-card-body">
+                        <p class="mb-3">Enhance your understanding of the democratic process and your civic responsibilities.</p>
+                        
+                        <div class="course-list">
+                            <h6 class="mb-3">Available Learning Modules</h6>
+                            <div class="course-item">
+                                <i class="fas fa-play-circle"></i>
+                                <span>Understanding Your Voting Rights</span>
+                            </div>
+                            <div class="course-item">
+                                <i class="fas fa-play-circle"></i>
+                                <span>How Blockchain Voting Works</span>
+                            </div>
+                            <div class="course-item">
+                                <i class="fas fa-play-circle"></i>
+                                <span>Biometric Authentication Process</span>
+                            </div>
+                            <div class="course-item">
+                                <i class="fas fa-play-circle"></i>
+                                <span>Election Security & Transparency</span>
+                            </div>
                         </div>
-                        <button class="action-btn btn-info-custom" onclick="alert('Civic education portal coming soon!')">
-                            <i class="fas fa-book-open"></i> Start Learning
+                        
+                        <button class="btn-modern btn-info-modern w-100 mt-3" onclick="startCivicEducation()">
+                            <i class="fas fa-book-open"></i>
+                            Start Learning Journey
                         </button>
                     </div>
                 </div>
@@ -341,4 +745,173 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    initializeAnimations();
+    initializeTheme();
+    initializeInteractivity();
+});
+
+// Initialize animations
+function initializeAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    });
+
+    document.querySelectorAll('.animate-slide-up').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'all 0.6s ease-out';
+        observer.observe(el);
+    });
+}
+
+// Theme management
+let isDarkTheme = localStorage.getItem('darkTheme') === 'true';
+
+function initializeTheme() {
+    const themeIcon = document.getElementById('theme-icon');
+    if (isDarkTheme) {
+        document.body.classList.add('dark-theme');
+        themeIcon.className = 'fas fa-sun';
+    } else {
+        themeIcon.className = 'fas fa-moon';
+    }
+}
+
+function toggleTheme() {
+    isDarkTheme = !isDarkTheme;
+    const themeIcon = document.getElementById('theme-icon');
+    
+    if (isDarkTheme) {
+        document.body.classList.add('dark-theme');
+        themeIcon.className = 'fas fa-sun';
+    } else {
+        document.body.classList.remove('dark-theme');
+        themeIcon.className = 'fas fa-moon';
+    }
+    
+    localStorage.setItem('darkTheme', isDarkTheme);
+}
+
+// Initialize interactivity
+function initializeInteractivity() {
+    // Add hover effects to course items
+    document.querySelectorAll('.course-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const courseName = this.querySelector('span').textContent;
+            showNotification(`Starting course: ${courseName}`, 'info');
+        });
+    });
+    
+    // Add click effects to stat cards
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.addEventListener('click', function() {
+            this.style.transform = 'translateY(-12px) scale(1.05)';
+            setTimeout(() => {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            }, 200);
+        });
+    });
+}
+
+// Interactive functions
+function startCivicEducation() {
+    showNotification('Civic education portal will be available soon!', 'info');
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} notification-toast`;
+    notification.innerHTML = `
+        <i class="fas fa-${getIconForType(type)} me-2"></i>
+        ${message}
+        <button class="btn-close" onclick="this.parentElement.remove()"></button>
+    `;
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 15px;
+        color: white;
+        padding: 1rem;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+}
+
+function getIconForType(type) {
+    const icons = {
+        'success': 'check-circle',
+        'error': 'exclamation-circle',
+        'warning': 'exclamation-triangle',
+        'info': 'info-circle'
+    };
+    return icons[type] || 'info-circle';
+}
+
+// Add CSS animations for notifications
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    .notification-toast .btn-close {
+        background: none;
+        border: none;
+        color: white;
+        opacity: 0.7;
+        font-size: 1.2rem;
+        padding: 0;
+        margin-left: auto;
+    }
+    
+    .notification-toast .btn-close:hover {
+        opacity: 1;
+    }
+`;
+document.head.appendChild(style);
+</script>
 {% endblock %}

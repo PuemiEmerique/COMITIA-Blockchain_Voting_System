@@ -1,0 +1,471 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Role Login - COMITIA{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --primary-color: #2c3e50;
+    --accent-color: #e94560;
+    --success-color: #27ae60;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+body {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    min-height: 100vh;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.role-login-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-header h1 {
+    color: var(--accent-color);
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.login-header p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+}
+
+.role-selection-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.role-card {
+    background: var(--glass-bg);
+    border: 2px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    position: relative;
+}
+
+.role-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent-color);
+    box-shadow: 0 8px 25px rgba(233, 69, 96, 0.3);
+}
+
+.role-card.selected {
+    border-color: var(--accent-color);
+    background: rgba(233, 69, 96, 0.1);
+    box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
+}
+
+
+.role-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+    background: var(--accent-color);
+}
+
+.role-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.role-description {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    margin-bottom: 0;
+}
+
+.selected-indicator {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--accent-color);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    animation: checkmarkPop 0.3s ease-out;
+}
+
+.role-card.selected .selected-indicator {
+    display: flex;
+}
+
+@keyframes checkmarkPop {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.login-form {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 2rem;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    color: white;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.login-btn {
+    background: var(--accent-color);
+    border: none;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.login-btn:hover:not(:disabled) {
+    background: #d63850;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+}
+
+.login-btn:disabled {
+    background: #7f8c8d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.selected-role-info {
+    background: rgba(233, 69, 96, 0.1);
+    border: 1px solid rgba(233, 69, 96, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.selected-role-info.hidden {
+    display: none;
+}
+
+.back-link {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.back-link a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.back-link a:hover {
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .role-selection-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .login-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .role-card {
+        padding: 1rem;
+    }
+    
+    .role-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .role-selection-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="role-login-container">
+    <!-- Header -->
+    <div class="login-header">
+        <h1><i class="fas fa-user-cog"></i> Admin Role Login</h1>
+        <p>Select a role to access the corresponding dashboard</p>
+    </div>
+
+    <!-- Role Selection Grid -->
+    <div class="role-selection-grid">
+        <!-- Super Admin -->
+        <div class="role-card" data-role="superadmin" onclick="selectRole('superadmin')">
+            <div class="selected-indicator">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="role-icon">
+                <i class="fas fa-crown"></i>
+            </div>
+            <div class="role-title">Super Admin</div>
+            <div class="role-description">Complete system control</div>
+        </div>
+
+        <!-- Citizen -->
+        <div class="role-card" data-role="citizen" onclick="selectRole('citizen')">
+            <div class="selected-indicator">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="role-icon">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="role-title">Citizen</div>
+            <div class="role-description">Basic user interface</div>
+        </div>
+
+        <!-- Voter -->
+        <div class="role-card" data-role="voter" onclick="selectRole('voter')">
+            <div class="selected-indicator">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="role-icon">
+                <i class="fas fa-vote-yea"></i>
+            </div>
+            <div class="role-title">Voter</div>
+            <div class="role-description">Voting interface</div>
+        </div>
+
+        <!-- Candidate -->
+        <div class="role-card" data-role="candidate" onclick="selectRole('candidate')">
+            <div class="selected-indicator">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="role-icon">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="role-title">Candidate</div>
+            <div class="role-description">Campaign management</div>
+        </div>
+
+        <!-- Voter Official -->
+        <div class="role-card" data-role="voter_official" onclick="selectRole('voter_official')">
+            <div class="selected-indicator">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="role-icon">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="role-title">Voter Official</div>
+            <div class="role-description">Voter verification</div>
+        </div>
+
+        <!-- Electoral Commission -->
+        <div class="role-card" data-role="electoral_commission" onclick="selectRole('electoral_commission')">
+            <div class="selected-indicator">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="role-icon">
+                <i class="fas fa-landmark"></i>
+            </div>
+            <div class="role-title">Electoral Commission</div>
+            <div class="role-description">Election oversight</div>
+        </div>
+    </div>
+
+    <!-- Login Form -->
+    <div class="login-form">
+        <form method="post" id="roleLoginForm">
+            {% csrf_token %}
+            
+            <div class="selected-role-info hidden" id="selectedRoleInfo">
+                <strong>Selected Role:</strong> <span id="selectedRoleName"></span>
+            </div>
+
+            <input type="hidden" name="selected_role" id="selectedRoleInput">
+
+            <div class="form-group">
+                <label for="username">
+                    <i class="fas fa-user"></i> Username
+                </label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">
+                    <i class="fas fa-lock"></i> Password
+                </label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn" disabled>
+                <i class="fas fa-sign-in-alt"></i> Login as <span id="loginRoleName">Selected Role</span>
+            </button>
+        </form>
+
+        {% if messages %}
+            <div class="mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Back Link -->
+    <div class="back-link">
+        <a href="{% url 'accounts:login' %}">
+            <i class="fas fa-arrow-left"></i> Back to Regular Login
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let selectedRole = null;
+
+const roleNames = {
+    'superadmin': 'Super Admin',
+    'citizen': 'Citizen',
+    'voter': 'Voter',
+    'candidate': 'Candidate',
+    'voter_official': 'Voter Official',
+    'electoral_commission': 'Electoral Commission'
+};
+
+function selectRole(role) {
+    console.log('Role selected:', role);
+    selectedRole = role;
+    
+    // Remove selected class from all cards
+    document.querySelectorAll('.role-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked card
+    const selectedCard = document.querySelector(`[data-role="${role}"]`);
+    if (selectedCard) {
+        selectedCard.classList.add('selected');
+    }
+    
+    // Update form
+    const roleInput = document.getElementById('selectedRoleInput');
+    const roleInfo = document.getElementById('selectedRoleInfo');
+    const roleName = document.getElementById('selectedRoleName');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginRoleName = document.getElementById('loginRoleName');
+    
+    if (roleInput) roleInput.value = role;
+    if (roleInfo) roleInfo.classList.remove('hidden');
+    if (roleName) roleName.textContent = roleNames[role];
+    if (loginBtn) loginBtn.disabled = false;
+    if (loginRoleName) loginRoleName.textContent = roleNames[role];
+    
+    // Scroll to form
+    document.querySelector('.login-form').scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+    });
+}
+
+// Form submission
+document.getElementById('roleLoginForm')?.addEventListener('submit', function(e) {
+    if (!selectedRole) {
+        e.preventDefault();
+        alert('Please select a role first.');
+        return false;
+    }
+    
+    console.log('Logging in as:', selectedRole);
+    return true;
+});
+
+// Auto-focus username when role is selected
+function focusUsername() {
+    if (selectedRole) {
+        document.getElementById('username')?.focus();
+    }
+}
+
+// Add keyboard support for role selection
+document.addEventListener('keydown', function(e) {
+    if (e.key >= '1' && e.key <= '6') {
+        const roles = ['superadmin', 'citizen', 'voter', 'candidate', 'voter_official', 'electoral_commission'];
+        const roleIndex = parseInt(e.key) - 1;
+        if (roles[roleIndex]) {
+            selectRole(roles[roleIndex]);
+        }
+    }
+});
+
+console.log('Role-based login loaded');
+console.log('Keyboard shortcuts: 1-6 to select roles');
+</script>
+{% endblock %}

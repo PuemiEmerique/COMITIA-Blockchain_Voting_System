@@ -69,6 +69,18 @@
             <p>Don't have an account? 
                 <a href="{% url 'accounts:register' %}">Sign up here</a>
             </p>
+            
+            <!-- Admin Role Login Link -->
+            <div class="admin-login-section">
+                <div class="divider">
+                    <span>Admin Access</span>
+                </div>
+                <a href="{% url 'accounts:role_login' %}" class="role-login-access">
+                    <i class="fas fa-crown"></i>
+                    <span>Role-Based Login</span>
+                    <small>For system administrators</small>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -296,17 +308,67 @@
     border-top: 1px solid #eee;
 }
 
+.auth-footer p {
+    color: #64748b;
+    margin: 0;
+}
+
 .auth-footer a {
-    color: #1e3a8a;
+    color: #3b82f6;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .auth-footer a:hover {
     text-decoration: underline;
 }
 
-/* Biometric Modal Styles */
+/* Admin Login Section */
+.admin-login-section {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.admin-login-section .divider {
+    margin: 1.5rem 0;
+}
+
+.role-login-access {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #e94560, #ff6b6b);
+    color: white !important;
+    text-decoration: none !important;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(233, 69, 96, 0.3);
+}
+
+.role-login-access:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(233, 69, 96, 0.4);
+    text-decoration: none !important;
+}
+
+.role-login-access i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.role-login-access span {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.role-login-access small {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    color: rgba(255, 255, 255, 0.9);
+}
+
 .modal {
     display: none;
     position: fixed;

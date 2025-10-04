@@ -1,0 +1,685 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+:root {
+    --primary-color: #2c3e50;
+    --accent-color: #e94560;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --info-color: #3498db;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+body {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    min-height: 100vh;
+    color: white;
+}
+
+.dashboard-container {
+    padding: 2rem 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.dashboard-header h1 {
+    color: var(--accent-color);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-header p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent-color);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.stat-icon.supporters { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+.stat-icon.events { background: linear-gradient(135deg, #3498db, #2980b9); }
+.stat-icon.donations { background: linear-gradient(135deg, #f39c12, #e67e22); }
+.stat-icon.reach { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.card-header h3 {
+    color: white;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.card-header i {
+    color: var(--accent-color);
+    font-size: 1.5rem;
+}
+
+.campaign-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 3px solid var(--accent-color);
+}
+
+.campaign-item h4 {
+    color: white;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.campaign-item p {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.event-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.event-date {
+    background: var(--accent-color);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 8px;
+    text-align: center;
+    min-width: 60px;
+}
+
+.event-details h5 {
+    color: white;
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+}
+
+.event-details p {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.btn-primary {
+    background: var(--accent-color);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: #d63850;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+}
+
+.btn-outline-light {
+    border-color: var(--glass-border);
+    color: white;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: white;
+    color: white;
+}
+
+.progress {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    height: 8px;
+}
+
+.progress-bar {
+    background: var(--accent-color);
+    border-radius: 10px;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    word-wrap: break-word;
+    box-sizing: border-box;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #3498db;
+}
+
+.campaign-card .card-body {
+    padding: 1.5rem;
+    overflow: hidden;
+    word-wrap: break-word;
+    box-sizing: border-box;
+}
+
+.campaign-btn {
+    background: #3498db;
+    border: none;
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.campaign-btn:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: white;
+}
+
+.campaign-btn.success {
+    background: #27ae60;
+}
+
+.campaign-btn.success:hover {
+    background: #229954;
+}
+
+.campaign-btn.warning {
+    background: #e67e22;
+}
+
+.campaign-btn.warning:hover {
+    background: #d35400;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.status-approved { background: #d1fae5; color: #065f46; }
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-rejected { background: #fee2e2; color: #991b1b; }
+
+.campaign-progress {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.progress-bar-custom {
+    height: 10px;
+    border-radius: 10px;
+    background: #e2e8f0;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #3498db;
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.campaign-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 2rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    background: #3498db;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 12px;
+    width: 2px;
+    height: calc(100% - 12px);
+    background: #e2e8f0;
+}
+
+.timeline-item:last-child::after {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .candidate-dashboard {
+        padding: 1rem 0;
+    }
+    
+    .dashboard-header {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .campaign-card .card-body {
+        padding: 1rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+        min-height: 100px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.5rem;
+    }
+    
+    .campaign-btn {
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="candidate-dashboard">
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1><i class="fas fa-user-tie"></i> Candidate Dashboard</h1>
+                    <p class="lead">Welcome, {{ user.get_full_name }}! Manage your campaign and connect with voters.</p>
+                </div>
+                <div class="col-md-4 text-md-right">
+                    <span class="status-badge status-{{ user.verification_status }}">
+                        {{ user.get_verification_status_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaign Stats Overview -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>{{ campaign_stats.total_supporters|default:"0" }}</h3>
+                <p>Total Supporters</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3>{{ campaign_stats.events_scheduled|default:"0" }}</h3>
+                <p>Events Scheduled</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-share-alt"></i>
+                </div>
+                <h3>{{ campaign_stats.social_media_reach|default:"0" }}</h3>
+                <p>Social Media Reach</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <h3>{{ campaign_stats.total_donations|default:"0" }} FCFA</h3>
+                <p>Campaign Funds</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Campaign Status & Progress -->
+            <div class="col-lg-8 mb-4">
+                <div class="campaign-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-flag"></i> Campaign Status & Progress</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="text-muted">Candidate ID</label>
+                                    <p class="h6">CND-{{ user.id|stringformat:"05d" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Registration Date</label>
+                                    <p class="h6">{{ user.date_joined|date:"F d, Y" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted">Campaign Status</label>
+                                    {% if user.verification_status == 'approved' %}
+                                        <p class="h6 text-success"><i class="fas fa-check-circle"></i> Approved & Active</p>
+                                    {% else %}
+                                        <p class="h6 text-warning"><i class="fas fa-clock"></i> Awaiting Approval</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="campaign-progress">
+                                    <h6>Campaign Progress</h6>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Profile Completion</small>
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-fill" style="width: 75%"></div>
+                                        </div>
+                                        <small class="text-muted">75% Complete</small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Campaign Setup</small>
+                                        <div class="progress-bar-custom">
+                                            <div class="progress-fill" style="width: 45%"></div>
+                                        </div>
+                                        <small class="text-muted">45% Complete</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 mb-4">
+                <div class="campaign-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="campaign-btn success" onclick="alert('Event scheduling coming soon!')">
+                            <i class="fas fa-calendar-plus"></i> Schedule Event
+                        </button>
+                        <button class="campaign-btn" onclick="alert('Social media management coming soon!')">
+                            <i class="fas fa-share-alt"></i> Social Media
+                        </button>
+                        <button class="campaign-btn warning" onclick="alert('Newsletter system coming soon!')">
+                            <i class="fas fa-envelope"></i> Send Newsletter
+                        </button>
+                        <button class="campaign-btn" onclick="alert('Analytics dashboard coming soon!')">
+                            <i class="fas fa-chart-bar"></i> View Analytics
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaign Management Section -->
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="campaign-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-bullhorn"></i> Campaign Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-calendar-alt"></i> Upcoming Events</h6>
+                                <div class="campaign-timeline">
+                                    <div class="timeline-item">
+                                        <h6>Town Hall Meeting</h6>
+                                        <p class="text-muted mb-1">December 15, 2025 at 7:00 PM</p>
+                                        <small class="text-muted">Community Center - Main Hall</small>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <h6>Campaign Rally</h6>
+                                        <p class="text-muted mb-1">December 20, 2025 at 6:00 PM</p>
+                                        <small class="text-muted">City Park - Central Stage</small>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <h6>Debate Preparation</h6>
+                                        <p class="text-muted mb-1">December 22, 2025 at 2:00 PM</p>
+                                        <small class="text-muted">Campaign Headquarters</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-chart-line"></i> Campaign Metrics</h6>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Supporter Growth</span>
+                                        <span class="text-success">+12%</span>
+                                    </div>
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-fill" style="width: 68%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Social Engagement</span>
+                                        <span class="text-success">+8%</span>
+                                    </div>
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-fill" style="width: 54%"></div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Campaign Funding</span>
+                                        <span class="text-warning">+3%</span>
+                                    </div>
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-fill" style="width: 32%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 mb-4">
+                <div class="campaign-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-user-circle"></i> Candidate Profile</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                <i class="fas fa-user fa-2x text-muted"></i>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Full Name</label>
+                            <p class="h6">{{ user.get_full_name }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Role</label>
+                            <p class="h6">{{ user.get_user_type_display }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Bio</label>
+                            <p class="small">{{ user.bio|default:"Complete your profile to help voters learn more about you and your campaign platform." }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-muted">Campaign Slogan</label>
+                            <p class="small font-italic">"Building a Better Tomorrow Together"</p>
+                        </div>
+                        <a href="{% url 'accounts:profile' %}" class="campaign-btn">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

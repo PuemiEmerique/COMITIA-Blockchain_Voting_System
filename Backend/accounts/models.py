@@ -219,6 +219,142 @@ class BiometricData(models.Model):
         db_table = 'biometric_data'
 
 
+class RoleApplication(models.Model):
+    """
+    Track role transition applications with document requirements
+    """
+    APPLICATION_STATUS = [
+        ('pending', 'Pending Review'),
+        ('under_review', 'Under Review'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('documents_required', 'Documents Required'),
+    ]
+    
+    APPLICATION_TYPES = [
+        ('voter', 'Voter Registration'),
+        ('candidate', 'Candidate Application'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='role_applications')
+    application_type = models.CharField(max_length=20, choices=APPLICATION_TYPES)
+    status = models.CharField(max_length=20, choices=APPLICATION_STATUS, default='pending')
+    application_date = models.DateTimeField(default=timezone.now)
+    reviewed_by = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='reviewed_applications'
+    )
+    review_date = models.DateTimeField(blank=True, null=True)
+    review_notes = models.TextField(blank=True, null=True)
+    
+    # Additional fields for candidate applications
+    political_party = models.CharField(max_length=100, blank=True, null=True)
+    campaign_slogan = models.CharField(max_length=200, blank=True, null=True)
+    manifesto = models.TextField(blank=True, null=True)
+    
+    class Meta:
+        db_table = 'role_applications'
+        ordering = ['-application_date']
+        unique_together = ['user', 'application_type', 'status']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.get_application_type_display()} ({self.get_status_display()})"
+
+
+class ApplicationDocument(models.Model):
+    """
+    Store documents uploaded for role applications
+    """
+    DOCUMENT_TYPES = [
+        ('national_id', 'National ID Card'),
+        ('passport', 'Passport'),
+        ('birth_certificate', 'Birth Certificate'),
+        ('proof_of_residence', 'Proof of Residence'),
+        ('educational_certificate', 'Educational Certificate'),
+        ('criminal_background_check', 'Criminal Background Check'),
+        ('tax_clearance', 'Tax Clearance Certificate'),
+        ('party_nomination', 'Political Party Nomination'),
+        ('affidavit', 'Sworn Affidavit'),
+        ('medical_certificate', 'Medical Certificate'),
+        ('other', 'Other Document'),
+    ]
+    
+    VERIFICATION_STATUS = [
+        ('pending', 'Pending Verification'),
+        ('verified', 'Verified'),
+        ('rejected', 'Rejected'),
+        ('expired', 'Expired'),
+    ]
+    
+    application = models.ForeignKey(RoleApplication, on_delete=models.CASCADE, related_name='documents')
+    document_type = models.CharField(max_length=30, choices=DOCUMENT_TYPES)
+    document_file = models.FileField(upload_to='application_documents/%Y/%m/')
+    original_filename = models.CharField(max_length=255)
+    file_size = models.PositiveIntegerField()  # Size in bytes
+    mime_type = models.CharField(max_length=100)
+    
+    # Verification fields
+    verification_status = models.CharField(max_length=20, choices=VERIFICATION_STATUS, default='pending')
+    verified_by = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='verified_documents'
+    )
+    verification_date = models.DateTimeField(blank=True, null=True)
+    verification_notes = models.TextField(blank=True, null=True)
+    
+    # Metadata
+    upload_date = models.DateTimeField(default=timezone.now)
+    expiry_date = models.DateField(blank=True, null=True)  # For documents with expiry
+    
+    class Meta:
+        db_table = 'application_documents'
+        ordering = ['-upload_date']
+        unique_together = ['application', 'document_type']
+    
+    def __str__(self):
+        return f"{self.application.user.username} - {self.get_document_type_display()}"
+    
+    @property
+    def file_size_mb(self):
+        """Return file size in MB"""
+        return round(self.file_size / (1024 * 1024), 2)
+    
+    @property
+    def is_image(self):
+        """Check if document is an image"""
+        return self.mime_type.startswith('image/')
+    
+    @property
+    def is_pdf(self):
+        """Check if document is a PDF"""
+        return self.mime_type == 'application/pdf'
+
+
+class DocumentRequirement(models.Model):
+    """
+    Define document requirements for different application types
+    """
+    application_type = models.CharField(max_length=20, choices=RoleApplication.APPLICATION_TYPES)
+    document_type = models.CharField(max_length=30, choices=ApplicationDocument.DOCUMENT_TYPES)
+    is_required = models.BooleanField(default=True)
+    description = models.TextField(help_text="Description of what this document should contain")
+    max_file_size_mb = models.PositiveIntegerField(default=5)  # Max file size in MB
+    allowed_formats = models.JSONField(default=list)  # List of allowed file formats
+    
+    class Meta:
+        db_table = 'document_requirements'
+        unique_together = ['application_type', 'document_type']
+    
+    def __str__(self):
+        return f"{self.get_application_type_display()} - {self.get_document_type_display()}"
+
+
 class UserActivity(models.Model):
     """
     Track user activities for audit purposes
@@ -232,10 +368,13 @@ class UserActivity(models.Model):
         ('election_created', 'Election Created'),
         ('candidate_approved', 'Candidate Approved'),
         ('voter_registered', 'Voter Registered'),
+        ('application_submitted', 'Application Submitted'),
+        ('document_uploaded', 'Document Uploaded'),
+        ('application_reviewed', 'Application Reviewed'),
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='activities')
-    activity_type = models.CharField(max_length=20, choices=ACTIVITY_TYPES)
+    activity_type = models.CharField(max_length=25, choices=ACTIVITY_TYPES)
     description = models.TextField(blank=True, null=True)
     ip_address = models.GenericIPAddressField(blank=True, null=True)
     user_agent = models.TextField(blank=True, null=True)

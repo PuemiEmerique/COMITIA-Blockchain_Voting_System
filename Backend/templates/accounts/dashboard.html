@@ -4,292 +4,747 @@
 {% block title %}Dashboard - COMITIA{% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
-    <!-- Dashboard Header -->
-    <div class="dashboard-header">
-        <div class="user-info">
-            <div class="user-avatar">
+<!-- Theme Toggle -->
+<div class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+    <i class="fas fa-moon" id="theme-icon"></i>
+</div>
+
+<div class="modern-dashboard-container">
+    <!-- Modern Dashboard Header -->
+    <div class="modern-dashboard-header animate-fade-in">
+        <div class="user-profile-section">
+            <div class="user-avatar-modern">
                 {% if user.profile_picture %}
-                    <img src="{{ user.profile_picture.url }}" alt="Profile">
+                    <img src="{{ user.profile_picture.url }}" alt="Profile Picture">
                 {% else %}
-                    <i class="fas fa-user"></i>
+                    <div class="avatar-placeholder">
+                        <i class="fas fa-user"></i>
+                    </div>
                 {% endif %}
+                <div class="avatar-status-indicator"></div>
             </div>
-            <div class="user-details">
-                <h1>Welcome, {{ user.get_full_name }}!</h1>
-                <p class="user-role">{{ user.get_user_type_display }}</p>
-                <div class="user-stats">
-                    <span class="stat-item">
-                        <i class="fas fa-calendar"></i>
-                        Member since {{ user.date_joined|date:"M Y" }}
-                    </span>
+            <div class="user-info-modern">
+                <div class="welcome-message">
+                    <h1 class="user-greeting">Welcome back, {{ user.get_full_name }}!</h1>
+                    <p class="user-subtitle">Ready to participate in democracy</p>
+                </div>
+                <div class="user-role-badge">
+                    <i class="fas fa-{% if user.user_type == 'citizen' %}users{% elif user.user_type == 'voter' %}vote-yea{% elif user.user_type == 'candidate' %}user-tie{% elif user.user_type == 'voter_official' %}clipboard-check{% else %}shield-alt{% endif %} me-2"></i>
+                    {{ user.get_user_type_display }}
+                </div>
+                <div class="user-metadata">
+                    <div class="metadata-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Member since {{ user.date_joined|date:"F Y" }}</span>
+                    </div>
+                    <div class="metadata-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Last active {{ user.last_login|timesince }} ago</span>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="dashboard-actions">
-            <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">
+        <div class="dashboard-actions-modern">
+            <a href="{% url 'accounts:profile' %}" class="btn-modern btn-primary-modern">
                 <i class="fas fa-user-edit"></i>
                 Edit Profile
             </a>
+            <button class="btn-modern btn-secondary-modern" onclick="showQuickActions()">
+                <i class="fas fa-bolt"></i>
+                Quick Actions
+            </button>
         </div>
     </div>
 
-    <!-- Dashboard Content Based on User Type -->
-    {% if user.user_type == 'citizen' %}
-        {% include 'dashboards/citizen_dashboard.html' %}
-    {% elif user.user_type == 'voter' %}
-        {% include 'dashboards/voter_dashboard.html' %}
-    {% elif user.user_type == 'candidate' %}
-        {% include 'dashboards/candidate_dashboard.html' %}
-    {% elif user.user_type == 'voter_official' %}
-        {% include 'dashboards/voter_official_dashboard.html' %}
-    {% elif user.user_type == 'electoral_commission' %}
-        {% include 'dashboards/electoral_commission_dashboard.html' %}
-    {% endif %}
+    <!-- Role-Based Dashboard Content -->
+    <div class="dashboard-content-wrapper animate-slide-up">
+        {% if user.user_type == 'citizen' %}
+            {% include 'dashboards/citizen_dashboard.html' %}
+        {% elif user.user_type == 'voter' %}
+            {% include 'dashboards/voter_dashboard.html' %}
+        {% elif user.user_type == 'candidate' %}
+            {% include 'dashboards/candidate_dashboard.html' %}
+        {% elif user.user_type == 'voter_official' %}
+            {% include 'dashboards/voter_official_dashboard.html' %}
+        {% elif user.user_type == 'electoral_commission' %}
+            {% include 'dashboards/electoral_commission_dashboard.html' %}
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions Modal -->
+<div id="quickActionsModal" class="quick-actions-modal" style="display: none;">
+    <div class="modal-content-modern">
+        <div class="modal-header-modern">
+            <h5><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            <button class="modal-close" onclick="hideQuickActions()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body-modern">
+            <div class="quick-actions-grid">
+                <a href="{% url 'accounts:profile' %}" class="quick-action-item">
+                    <div class="action-icon">
+                        <i class="fas fa-user-edit"></i>
+                    </div>
+                    <span>Edit Profile</span>
+                </a>
+                <a href="{% url 'accounts:logout' %}" class="quick-action-item">
+                    <div class="action-icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <span>Logout</span>
+                </a>
+                <button class="quick-action-item" onclick="showNotification('Settings coming soon!', 'info')">
+                    <div class="action-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <span>Settings</span>
+                </button>
+                <button class="quick-action-item" onclick="showNotification('Help center coming soon!', 'info')">
+                    <div class="action-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <span>Help</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
 {% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
 <style>
-.dashboard-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 20px;
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --secondary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.37);
+    --shadow-hover: 0 15px 35px rgba(31, 38, 135, 0.5);
+    --border-radius: 20px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.dashboard-header {
-    background: white;
-    border-radius: 15px;
-    padding: 30px;
-    margin-bottom: 30px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+body {
+    background: var(--primary-gradient);
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Modern Dashboard Container */
+.modern-dashboard-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Modern Dashboard Header */
+.modern-dashboard-header {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-light);
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.user-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     color: white;
-    font-size: 2rem;
+    position: relative;
     overflow: hidden;
 }
 
-.user-avatar img {
+.modern-dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--secondary-gradient);
+}
+
+/* User Profile Section */
+.user-profile-section {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.user-avatar-modern {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--secondary-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);
+    transition: var(--transition);
+}
+
+.user-avatar-modern:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(79, 172, 254, 0.5);
+}
+
+.user-avatar-modern img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.user-details h1 {
-    font-size: 2rem;
-    color: #333;
-    margin-bottom: 5px;
+.avatar-placeholder {
+    font-size: 2.5rem;
+    color: white;
 }
 
-.user-role {
-    color: #667eea;
+.avatar-status-indicator {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+    background: #38ef7d;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* User Info Modern */
+.user-info-modern {
+    flex: 1;
+}
+
+.welcome-message {
+    margin-bottom: 1rem;
+}
+
+.user-greeting {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.user-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0;
+}
+
+.user-role-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background: var(--success-gradient);
+    border-radius: 50px;
     font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 10px 30px rgba(17, 153, 142, 0.3);
     text-transform: uppercase;
-    font-size: 0.9rem;
-    margin-bottom: 10px;
+    letter-spacing: 0.5px;
 }
 
-.user-stats {
+.user-metadata {
     display: flex;
-    gap: 20px;
-}
-
-.stat-item {
-    color: #666;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.dashboard-actions {
-    display: flex;
-    gap: 15px;
-}
-
-/* Dashboard Grid */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-    margin-bottom: 40px;
-}
-
-.dashboard-card {
-    background: white;
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.dashboard-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-}
-
-.card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-
-.card-title {
-    font-size: 1.3rem;
-    color: #333;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.card-title i {
-    color: #667eea;
-}
-
-.card-content {
-    margin-bottom: 20px;
-}
-
-.card-actions {
-    display: flex;
-    gap: 10px;
+    gap: 2rem;
     flex-wrap: wrap;
 }
 
-/* Status Badges */
-.status-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
+.metadata-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+}
+
+.metadata-item i {
+    color: #4facfe;
+}
+
+/* Dashboard Actions Modern */
+.dashboard-actions-modern {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-modern {
+    background: var(--secondary-gradient);
+    border: none;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 50px;
     font-weight: 600;
-    text-transform: uppercase;
+    font-size: 1rem;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);
+    cursor: pointer;
 }
 
-.status-badge.pending {
-    background: #fff3cd;
-    color: #856404;
+.btn-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(79, 172, 254, 0.5);
+    color: white;
 }
 
-.status-badge.approved {
-    background: #d4edda;
-    color: #155724;
+.btn-primary-modern {
+    background: var(--success-gradient);
+    box-shadow: 0 10px 30px rgba(17, 153, 142, 0.3);
 }
 
-.status-badge.rejected {
-    background: #f8d7da;
-    color: #721c24;
+.btn-primary-modern:hover {
+    box-shadow: 0 15px 40px rgba(17, 153, 142, 0.5);
 }
 
-.status-badge.active {
-    background: #d1ecf1;
-    color: #0c5460;
+.btn-secondary-modern {
+    background: var(--warning-gradient);
+    box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
 }
 
-.status-badge.verified {
-    background: #d4edda;
-    color: #155724;
+.btn-secondary-modern:hover {
+    box-shadow: 0 15px 40px rgba(240, 147, 251, 0.5);
 }
 
-/* Quick Stats */
-.quick-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
+/* Dashboard Content Wrapper */
+.dashboard-content-wrapper {
+    position: relative;
 }
 
-.stat-card {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+/* Quick Actions Modal */
+.quick-actions-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
 }
 
-.stat-number {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #667eea;
-    margin-bottom: 5px;
+.modal-content-modern {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-hover);
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
 }
 
-.stat-label {
-    color: #666;
-    font-size: 0.9rem;
-}
-
-/* Lists */
-.item-list {
-    list-style: none;
-    padding: 0;
-}
-
-.item-list li {
-    padding: 15px 0;
-    border-bottom: 1px solid #eee;
+.modal-header-modern {
+    background: var(--secondary-gradient);
+    padding: 1.5rem;
+    color: white;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.item-list li:last-child {
-    border-bottom: none;
-}
-
-.item-info h4 {
-    margin: 0 0 5px 0;
-    color: #333;
-}
-
-.item-info p {
+.modal-header-modern h5 {
     margin: 0;
-    color: #666;
-    font-size: 0.9rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.modal-body-modern {
+    padding: 2rem;
+    color: white;
+}
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.quick-action-item {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    color: white;
+    transition: var(--transition);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.quick-action-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+    color: white;
+}
+
+.action-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--secondary-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    position: fixed;
+    top: 100px;
+    right: 2rem;
+    z-index: 1000;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 50px;
+    padding: 0.75rem;
+    color: white;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+/* Animations */
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Dark Theme */
+.dark-theme {
+    --primary-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    --glass-bg: rgba(0, 0, 0, 0.3);
+    --glass-border: rgba(255, 255, 255, 0.1);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .dashboard-header {
-        flex-direction: column;
-        gap: 20px;
-        text-align: center;
+    .modern-dashboard-container {
+        padding: 1rem;
     }
     
-    .user-info {
+    .modern-dashboard-header {
         flex-direction: column;
+        gap: 2rem;
         text-align: center;
+        padding: 1.5rem;
     }
     
-    .dashboard-grid {
+    .user-profile-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .user-metadata {
+        justify-content: center;
+        gap: 1rem;
+    }
+    
+    .dashboard-actions-modern {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .user-greeting {
+        font-size: 2rem;
+    }
+    
+    .quick-actions-grid {
         grid-template-columns: 1fr;
     }
     
-    .quick-stats {
-        grid-template-columns: repeat(2, 1fr);
+    .theme-toggle {
+        right: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-greeting {
+        font-size: 1.5rem;
     }
     
-    .card-actions {
-        justify-content: center;
+    .user-avatar-modern {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .btn-modern {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
     }
 }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    initializeAnimations();
+    initializeTheme();
+    initializeInteractivity();
+});
+
+// Initialize animations
+function initializeAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    });
+
+    document.querySelectorAll('.animate-slide-up').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'all 0.6s ease-out';
+        observer.observe(el);
+    });
+}
+
+// Theme management
+let isDarkTheme = localStorage.getItem('darkTheme') === 'true';
+
+function initializeTheme() {
+    const themeIcon = document.getElementById('theme-icon');
+    if (isDarkTheme) {
+        document.body.classList.add('dark-theme');
+        themeIcon.className = 'fas fa-sun';
+    } else {
+        themeIcon.className = 'fas fa-moon';
+    }
+}
+
+function toggleTheme() {
+    isDarkTheme = !isDarkTheme;
+    const themeIcon = document.getElementById('theme-icon');
+    
+    if (isDarkTheme) {
+        document.body.classList.add('dark-theme');
+        themeIcon.className = 'fas fa-sun';
+    } else {
+        document.body.classList.remove('dark-theme');
+        themeIcon.className = 'fas fa-moon';
+    }
+    
+    localStorage.setItem('darkTheme', isDarkTheme);
+}
+
+// Initialize interactivity
+function initializeInteractivity() {
+    // Add hover effect to avatar
+    const avatar = document.querySelector('.user-avatar-modern');
+    if (avatar) {
+        avatar.addEventListener('click', function() {
+            this.style.transform = 'scale(1.1) rotate(5deg)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1.05)';
+            }, 200);
+        });
+    }
+    
+    // Close modal when clicking outside
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('quickActionsModal');
+        if (e.target === modal) {
+            hideQuickActions();
+        }
+    });
+    
+    // Keyboard navigation for modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            hideQuickActions();
+        }
+    });
+}
+
+// Quick Actions Modal Functions
+function showQuickActions() {
+    const modal = document.getElementById('quickActionsModal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    // Focus trap
+    const focusableElements = modal.querySelectorAll('button, a, [tabindex]:not([tabindex="-1"])');
+    if (focusableElements.length > 0) {
+        focusableElements[0].focus();
+    }
+}
+
+function hideQuickActions() {
+    const modal = document.getElementById('quickActionsModal');
+    modal.style.animation = 'fadeOut 0.3s ease-out';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+        modal.style.animation = '';
+        document.body.style.overflow = '';
+    }, 300);
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} notification-toast`;
+    notification.innerHTML = `
+        <i class="fas fa-${getIconForType(type)} me-2"></i>
+        ${message}
+        <button class="btn-close" onclick="this.parentElement.remove()"></button>
+    `;
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        min-width: 300px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 15px;
+        color: white;
+        padding: 1rem;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+}
+
+function getIconForType(type) {
+    const icons = {
+        'success': 'check-circle',
+        'error': 'exclamation-circle',
+        'warning': 'exclamation-triangle',
+        'info': 'info-circle'
+    };
+    return icons[type] || 'info-circle';
+}
+
+// Add CSS animations for notifications and modals
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+    
+    .notification-toast .btn-close {
+        background: none;
+        border: none;
+        color: white;
+        opacity: 0.7;
+        font-size: 1.2rem;
+        padding: 0;
+        margin-left: auto;
+    }
+    
+    .notification-toast .btn-close:hover {
+        opacity: 1;
+    }
+`;
+document.head.appendChild(style);
+</script>
 {% endblock %}

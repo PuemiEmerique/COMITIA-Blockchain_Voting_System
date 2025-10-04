@@ -16,6 +16,7 @@ from django.db import transaction
 
 from .models import User, CitizenProfile, VoterProfile, CandidateProfile
 from .models import VoterOfficialProfile, ElectoralCommissionProfile
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 @csrf_protect
@@ -123,6 +124,10 @@ def dashboard_view(request):
     """
     user = request.user
     
+    # Check if user is superadmin/staff
+    if user.is_superuser or user.is_staff:
+        return redirect('accounts:superadmin_dashboard')
+    
     # Route to appropriate dashboard based on user type
     dashboard_routes = {
         'citizen': 'accounts:citizen_dashboard',
@@ -161,7 +166,7 @@ def citizen_dashboard_view(request):
     # Get or create citizen profile
     try:
         citizen_profile = user.citizen_profile
-    except:
+    except CitizenProfile.DoesNotExist:
         citizen_profile, created = CitizenProfile.objects.get_or_create(user=user)
     
     context = {
@@ -185,8 +190,19 @@ def voter_dashboard_view(request):
     # Get or create voter profile
     try:
         voter_profile = user.voter_profile
-    except:
-        voter_profile, created = VoterProfile.objects.get_or_create(user=user)
+    except VoterProfile.DoesNotExist:
+        # Generate unique voter ID
+        import uuid
+        voter_id = f"VTR{str(uuid.uuid4())[:8].upper()}"
+        
+        # Ensure voter_id is unique
+        while VoterProfile.objects.filter(voter_id=voter_id).exists():
+            voter_id = f"VTR{str(uuid.uuid4())[:8].upper()}"
+        
+        voter_profile, created = VoterProfile.objects.get_or_create(
+            user=user,
+            defaults={'voter_id': voter_id}
+        )
     
     # Mock data for elections (will be replaced with real data later)
     active_elections = []
@@ -215,8 +231,19 @@ def candidate_dashboard_view(request):
     # Get or create candidate profile
     try:
         candidate_profile = user.candidate_profile
-    except:
-        candidate_profile, created = CandidateProfile.objects.get_or_create(user=user)
+    except CandidateProfile.DoesNotExist:
+        # Generate unique candidate ID
+        import uuid
+        candidate_id = f"CND{str(uuid.uuid4())[:8].upper()}"
+        
+        # Ensure candidate_id is unique
+        while CandidateProfile.objects.filter(candidate_id=candidate_id).exists():
+            candidate_id = f"CND{str(uuid.uuid4())[:8].upper()}"
+        
+        candidate_profile, created = CandidateProfile.objects.get_or_create(
+            user=user,
+            defaults={'candidate_id': candidate_id}
+        )
     
     # Mock data for campaigns (will be replaced with real data later)
     campaigns = []
@@ -246,15 +273,36 @@ def voter_official_dashboard_view(request):
     """
     user = request.user
     
-    if not user.is_voter_official:
+    # Check permissions: superuser, staff, correct user_type, or role-based login session
+    selected_role = request.session.get('selected_role')
+    has_permission = (
+        user.is_superuser or 
+        user.is_staff or 
+        user.user_type == 'voter_official' or 
+        hasattr(user, 'voter_official_profile') or
+        selected_role == 'voter_official'
+    )
+    
+    if not has_permission:
         messages.error(request, 'Access denied. Voter Official privileges required.')
         return redirect('accounts:dashboard')
     
     # Get or create voter official profile
     try:
         official_profile = user.voter_official_profile
-    except:
-        official_profile, created = VoterOfficialProfile.objects.get_or_create(user=user)
+    except VoterOfficialProfile.DoesNotExist:
+        # Generate unique official ID
+        import uuid
+        official_id = f"OFF{str(uuid.uuid4())[:8].upper()}"
+        
+        # Ensure official_id is unique
+        while VoterOfficialProfile.objects.filter(official_id=official_id).exists():
+            official_id = f"OFF{str(uuid.uuid4())[:8].upper()}"
+        
+        official_profile, created = VoterOfficialProfile.objects.get_or_create(
+            user=user,
+            defaults={'official_id': official_id}
+        )
     
     # Mock data for pending registrations (will be replaced with real data later)
     pending_registrations = []
@@ -283,15 +331,36 @@ def electoral_commission_dashboard_view(request):
     """
     user = request.user
     
-    if not user.is_electoral_commission:
+    # Check permissions: superuser, staff, correct user_type, or role-based login session
+    selected_role = request.session.get('selected_role')
+    has_permission = (
+        user.is_superuser or 
+        user.is_staff or 
+        user.user_type == 'electoral_commission' or 
+        hasattr(user, 'electoral_commission_profile') or
+        selected_role == 'electoral_commission'
+    )
+    
+    if not has_permission:
         messages.error(request, 'Access denied. Electoral Commission privileges required.')
         return redirect('accounts:dashboard')
     
     # Get or create electoral commission profile
     try:
         commission_profile = user.electoral_commission_profile
-    except:
-        commission_profile, created = ElectoralCommissionProfile.objects.get_or_create(user=user)
+    except ElectoralCommissionProfile.DoesNotExist:
+        # Generate unique commission ID
+        import uuid
+        commission_id = f"COM{str(uuid.uuid4())[:8].upper()}"
+        
+        # Ensure commission_id is unique
+        while ElectoralCommissionProfile.objects.filter(commission_id=commission_id).exists():
+            commission_id = f"COM{str(uuid.uuid4())[:8].upper()}"
+        
+        commission_profile, created = ElectoralCommissionProfile.objects.get_or_create(
+            user=user,
+            defaults={'commission_id': commission_id}
+        )
     
     # Mock data for system overview (will be replaced with real data later)
     system_stats = {
@@ -394,5 +463,87 @@ def password_reset_view(request):
     
     return render(request, 'accounts/password_reset.html', {
         'title': 'Password Reset - COMITIA'
+    })
+
+
+@staff_member_required
+def superadmin_dashboard_view(request):
+    """
+    Super Admin Dashboard - Access to all dashboards and system management
+    """
+    # Get system statistics
+    total_users = User.objects.count()
+    total_voters = VoterProfile.objects.filter(voter_card_issued=True).count()
+    total_candidates = CandidateProfile.objects.filter(application_status='approved').count()
+    
+    # Try to get elections count (if elections app exists)
+    try:
+        from elections.models import Election
+        total_elections = Election.objects.count()
+    except:
+        total_elections = 0
+    
+    context = {
+        'title': 'Super Admin Dashboard - COMITIA',
+        'user': request.user,
+        'total_users': total_users,
+        'total_voters': total_voters,
+        'total_candidates': total_candidates,
+        'total_elections': total_elections,
+    }
+    
+    return render(request, 'dashboards/superadmin_dashboard.html', context)
+
+
+@csrf_protect
+@never_cache
+def role_login_view(request):
+    """
+    Role-based login view for superadmin to access different dashboards
+    """
+    if request.user.is_authenticated and not (request.user.is_superuser or request.user.is_staff):
+        return redirect('accounts:dashboard')
+    
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        selected_role = request.POST.get('selected_role')
+        
+        if username and password and selected_role:
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                # Check if user is authorized for role-based login
+                if not (user.is_superuser or user.is_staff):
+                    messages.error(request, 'You are not authorized to use role-based login.')
+                    return render(request, 'accounts/role_login.html', {
+                        'title': 'Role Login - COMITIA'
+                    })
+                
+                login(request, user)
+                
+                # Store selected role in session for dashboard routing
+                request.session['selected_role'] = selected_role
+                
+                # Route to appropriate dashboard based on selected role
+                role_routes = {
+                    'superadmin': 'accounts:superadmin_dashboard',
+                    'citizen': 'accounts:citizen_dashboard',
+                    'voter': 'accounts:voter_dashboard',
+                    'candidate': 'accounts:candidate_dashboard',
+                    'voter_official': 'accounts:voter_official_dashboard',
+                    'electoral_commission': 'accounts:electoral_commission_dashboard',
+                }
+                
+                dashboard_route = role_routes.get(selected_role, 'accounts:superadmin_dashboard')
+                
+                messages.success(request, f'Welcome! Logged in as {selected_role.replace("_", " ").title()}')
+                return redirect(dashboard_route)
+            else:
+                messages.error(request, 'Invalid username or password.')
+        else:
+            messages.error(request, 'Please provide username, password, and select a role.')
+    
+    return render(request, 'accounts/role_login.html', {
+        'title': 'Role Login - COMITIA'
     })
 

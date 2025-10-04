@@ -4,437 +4,699 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-.commission-dashboard {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+:root {
+    --primary-color: #2c3e50;
+    --accent-color: #e94560;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --info-color: #3498db;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+body {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
     min-height: 100vh;
-    padding: 2rem 0;
+    color: white;
+}
+
+.dashboard-container {
+    padding: 2rem 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .dashboard-header {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
+    text-align: center;
 }
 
-.commission-card {
-    background: rgba(255, 255, 255, 0.95);
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    height: 100%;
-    backdrop-filter: blur(10px);
+.dashboard-header h1 {
+    color: var(--accent-color);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
 }
 
-.commission-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-
-.commission-card .card-header {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    border: none;
-    border-radius: 20px 20px 0 0;
-    padding: 1.5rem;
+.dashboard-header p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
 }
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
 .stat-card {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
     padding: 1.5rem;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent-color);
 }
 
 .stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
 }
 
 .stat-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.admin-btn {
-    background: linear-gradient(135deg, #f093fb, #f5576c);
-    border: none;
-    color: white;
-    padding: 0.8rem 2rem;
-    border-radius: 50px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    width: 100%;
-    margin-bottom: 0.5rem;
-}
-
-.admin-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    color: white;
-}
-
-.admin-btn.primary {
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
-}
-
-.admin-btn.success {
-    background: linear-gradient(135deg, #10b981, #34d399);
-}
-
-.admin-btn.warning {
-    background: linear-gradient(135deg, #f59e0b, #fbbf24);
-}
-
-.admin-btn.danger {
-    background: linear-gradient(135deg, #ef4444, #f87171);
-}
-
-.system-status {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    border-radius: 15px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-}
-
-.activity-timeline {
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.activity-item {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid #e2e8f0;
-    transition: background-color 0.3s ease;
-}
-
-.activity-item:hover {
-    background-color: #f8fafc;
-}
-
-.activity-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 1rem;
-    font-size: 1.2rem;
-}
-
-.activity-election { background: #dbeafe; color: #1e40af; }
-.activity-user { background: #dcfce7; color: #166534; }
-.activity-security { background: #fef3c7; color: #92400e; }
-.activity-system { background: #f3e8ff; color: #7c3aed; }
-
-.quick-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
+    font-size: 1.8rem;
     margin-bottom: 1rem;
+    color: white;
 }
 
-.quick-stat {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
+.stat-icon.elections { background: linear-gradient(135deg, #3498db, #2980b9); }
+.stat-icon.candidates { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+.stat-icon.voters { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+.stat-icon.votes { background: linear-gradient(135deg, #f39c12, #e67e22); }
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.card-header h3 {
+    color: white;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.card-header i {
+    color: var(--accent-color);
+    font-size: 1.5rem;
+}
+
+.election-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
     padding: 1rem;
-    text-align: center;
+    margin-bottom: 1rem;
+    border-left: 3px solid var(--info-color);
+}
+
+.election-item.active {
+    border-left-color: var(--success-color);
+}
+
+.election-item.upcoming {
+    border-left-color: var(--warning-color);
+}
+
+.election-item h4 {
+    color: white;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.election-item p {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.candidate-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 3px solid var(--warning-color);
+}
+
+.candidate-item.approved {
+    border-left-color: var(--success-color);
+}
+
+.candidate-item.rejected {
+    border-left-color: #e74c3c;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-active { background: rgba(39, 174, 96, 0.2); color: #27ae60; }
+.status-upcoming { background: rgba(243, 156, 18, 0.2); color: #f39c12; }
+.status-completed { background: rgba(52, 152, 219, 0.2); color: #3498db; }
+.status-pending { background: rgba(243, 156, 18, 0.2); color: #f39c12; }
+.status-approved { background: rgba(39, 174, 96, 0.2); color: #27ae60; }
+.status-rejected { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+
+.btn-primary {
+    background: var(--accent-color);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: #d63850;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+}
+
+.btn-success {
+    background: var(--success-color);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    background: #229954;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: #e74c3c;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+    transform: translateY(-1px);
+}
+
+.btn-outline-light {
+    border-color: var(--glass-border);
+    color: white;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: white;
+    color: white;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.progress-ring {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    margin: 0 auto 1rem;
+}
+
+.progress-ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.progress-ring circle {
+    fill: none;
+    stroke-width: 4;
+}
+
+.progress-ring .bg {
+    stroke: rgba(255, 255, 255, 0.1);
+}
+
+.progress-ring .progress {
+    stroke: var(--accent-color);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease;
 }
 
 @media (max-width: 768px) {
-    .commission-dashboard {
-        padding: 1rem 0;
+    .content-grid {
+        grid-template-columns: 1fr;
     }
     
-    .dashboard-header {
-        padding: 1.5rem;
-        margin-bottom: 1rem;
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
     }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="commission-dashboard">
-    <div class="container">
-        <!-- Dashboard Header -->
-        <div class="dashboard-header">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1><i class="fas fa-crown"></i> Electoral Commission Dashboard</h1>
-                    <p class="lead">Welcome, {{ user.get_full_name }}! Oversee the entire election process and system administration.</p>
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <h1><i class="fas fa-landmark"></i> Electoral Commission Dashboard</h1>
+        <p>Oversee elections, approve candidates, and ensure electoral integrity</p>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon elections">
+                <i class="fas fa-poll"></i>
+            </div>
+            <div class="stat-value">5</div>
+            <div class="stat-label">Active Elections</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon candidates">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="stat-value">127</div>
+            <div class="stat-label">Registered Candidates</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon voters">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value">45,892</div>
+            <div class="stat-label">Registered Voters</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon votes">
+                <i class="fas fa-vote-yea"></i>
+            </div>
+            <div class="stat-value">32,156</div>
+            <div class="stat-label">Total Votes Cast</div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Active Elections -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Active Elections</h3>
                 </div>
-                <div class="col-md-4 text-md-right">
-                    <span class="badge bg-warning px-3 py-2">
-                        <i class="fas fa-crown"></i> Commission Authority
-                    </span>
+                
+                <div class="election-item active">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4>Presidential Election 2024</h4>
+                            <p><strong>Start:</strong> October 15, 2024 | <strong>End:</strong> October 17, 2024</p>
+                            <p><strong>Candidates:</strong> 8 | <strong>Votes Cast:</strong> 15,432</p>
+                        </div>
+                        <span class="status-badge status-active">Active</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-eye"></i> Monitor
+                        </button>
+                        <button class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-chart-bar"></i> Results
+                        </button>
+                    </div>
+                </div>
+
+                <div class="election-item upcoming">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4>Local Council Elections</h4>
+                            <p><strong>Start:</strong> November 5, 2024 | <strong>End:</strong> November 7, 2024</p>
+                            <p><strong>Candidates:</strong> 24 | <strong>Preparation:</strong> 85%</p>
+                        </div>
+                        <span class="status-badge status-upcoming">Upcoming</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-cog"></i> Configure
+                        </button>
+                        <button class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-users"></i> Candidates
+                        </button>
+                    </div>
+                </div>
+
+                <div class="election-item">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4>Senate Elections</h4>
+                            <p><strong>Start:</strong> March 15, 2025 | <strong>End:</strong> March 17, 2025</p>
+                            <p><strong>Status:</strong> Planning Phase</p>
+                        </div>
+                        <span class="status-badge status-upcoming">Planning</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Setup
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candidate Applications -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-clipboard-check"></i>
+                    <h3>Pending Candidate Applications</h3>
+                </div>
+                
+                <div class="candidate-item">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4>Robert Martinez</h4>
+                            <p><strong>Position:</strong> Mayor | <strong>Party:</strong> Democratic Party</p>
+                            <p><strong>Submitted:</strong> 2 days ago | <strong>Documents:</strong> Complete</p>
+                        </div>
+                        <span class="status-badge status-pending">Pending</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success btn-sm">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="btn btn-danger btn-sm">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                        <button class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-eye"></i> Review
+                        </button>
+                    </div>
+                </div>
+
+                <div class="candidate-item">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4>Lisa Thompson</h4>
+                            <p><strong>Position:</strong> City Council | <strong>Party:</strong> Independent</p>
+                            <p><strong>Submitted:</strong> 1 day ago | <strong>Documents:</strong> Under Review</p>
+                        </div>
+                        <span class="status-badge status-pending">Pending</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success btn-sm">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="btn btn-danger btn-sm">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                        <button class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-eye"></i> Review
+                        </button>
+                    </div>
+                </div>
+
+                <div class="candidate-item approved">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4>James Wilson</h4>
+                            <p><strong>Position:</strong> Governor | <strong>Party:</strong> Republican Party</p>
+                            <p><strong>Approved:</strong> Yesterday | <strong>Candidate ID:</strong> CND87654321</p>
+                        </div>
+                        <span class="status-badge status-approved">Approved</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- System Stats Overview -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-poll"></i>
+        <!-- Sidebar Content -->
+        <div class="sidebar-content">
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Quick Actions</h3>
                 </div>
-                <h3>{{ system_stats.total_elections|default:"0" }}</h3>
-                <p>Total Elections</p>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-play-circle"></i>
+                
+                <div class="quick-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Election
+                    </button>
+                    <button class="btn btn-outline-light">
+                        <i class="fas fa-users"></i> Manage Candidates
+                    </button>
+                    <button class="btn btn-outline-light">
+                        <i class="fas fa-chart-bar"></i> View Reports
+                    </button>
+                    <button class="btn btn-outline-light">
+                        <i class="fas fa-cog"></i> System Settings
+                    </button>
                 </div>
-                <h3>{{ system_stats.active_elections|default:"0" }}</h3>
-                <p>Active Elections</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h3>{{ system_stats.total_voters|default:"0" }}</h3>
-                <p>Registered Voters</p>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-user-tie"></i>
-                </div>
-                <h3>{{ system_stats.pending_candidates|default:"0" }}</h3>
-                <p>Pending Candidates</p>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-vote-yea"></i>
-                </div>
-                <h3>{{ system_stats.total_votes_cast|default:"0" }}</h3>
-                <p>Total Votes Cast</p>
-            </div>
-        </div>
 
-        <div class="row">
-            <!-- System Status & Control -->
-            <div class="col-lg-8 mb-4">
-                <div class="commission-card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-tachometer-alt"></i> System Status & Control Center</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="system-status">
-                            <h6><i class="fas fa-server"></i> System Health Monitor</h6>
-                            <div class="quick-stats">
-                                <div class="quick-stat">
-                                    <i class="fas fa-database text-success"></i>
-                                    <p class="small mb-0">Database</p>
-                                    <strong class="text-success">Online</strong>
-                                </div>
-                                <div class="quick-stat">
-                                    <i class="fas fa-link text-success"></i>
-                                    <p class="small mb-0">Blockchain</p>
-                                    <strong class="text-success">Connected</strong>
-                                </div>
-                                <div class="quick-stat">
-                                    <i class="fas fa-shield-alt text-success"></i>
-                                    <p class="small mb-0">Security</p>
-                                    <strong class="text-success">Active</strong>
-                                </div>
-                                <div class="quick-stat">
-                                    <i class="fas fa-users text-warning"></i>
-                                    <p class="small mb-0">Active Users</p>
-                                    <strong class="text-warning">127</strong>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row mt-3">
-                            <div class="col-md-6">
-                                <h6><i class="fas fa-poll"></i> Election Management</h6>
-                                <button class="admin-btn primary" onclick="alert('Election creation coming soon!')">
-                                    <i class="fas fa-plus"></i> Create New Election
-                                </button>
-                                <button class="admin-btn" onclick="alert('Election management coming soon!')">
-                                    <i class="fas fa-cog"></i> Manage Elections
-                                </button>
-                                <button class="admin-btn success" onclick="alert('Results dashboard coming soon!')">
-                                    <i class="fas fa-chart-bar"></i> View Results
-                                </button>
-                            </div>
-                            <div class="col-md-6">
-                                <h6><i class="fas fa-users-cog"></i> User Management</h6>
-                                <button class="admin-btn warning" onclick="alert('Candidate approval coming soon!')">
-                                    <i class="fas fa-user-check"></i> Approve Candidates
-                                </button>
-                                <button class="admin-btn danger" onclick="alert('User role management coming soon!')">
-                                    <i class="fas fa-users-cog"></i> Manage User Roles
-                                </button>
-                                <button class="admin-btn" onclick="alert('System backup coming soon!')">
-                                    <i class="fas fa-database"></i> System Backup
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Commission Information -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-id-card"></i>
+                    <h3>Commission Information</h3>
+                </div>
+                
+                <div style="color: rgba(255,255,255,0.8); line-height: 1.6;">
+                    <p><strong>Commission ID:</strong> {{ profile.commission_id|default:"COM12345678" }}</p>
+                    <p><strong>Position:</strong> {{ profile.position|default:"Commissioner" }}</p>
+                    <p><strong>Jurisdiction:</strong> {{ profile.jurisdiction|default:"National Level" }}</p>
+                    <p><strong>Term:</strong> 2022 - 2027</p>
+                    <p><strong>Status:</strong> 
+                        <span class="status-badge status-active">Active</span>
+                    </p>
                 </div>
             </div>
-            
-            <div class="col-lg-4 mb-4">
-                <div class="commission-card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
-                    </div>
-                    <div class="card-body">
-                        <button class="admin-btn primary" onclick="alert('Emergency protocols coming soon!')">
-                            <i class="fas fa-exclamation-triangle"></i> Emergency Protocols
-                        </button>
-                        <button class="admin-btn warning" onclick="alert('System maintenance coming soon!')">
-                            <i class="fas fa-tools"></i> System Maintenance
-                        </button>
-                        <button class="admin-btn success" onclick="alert('Audit reports coming soon!')">
-                            <i class="fas fa-clipboard-check"></i> Generate Audit Report
-                        </button>
-                        <button class="admin-btn" onclick="alert('Security scan coming soon!')">
-                            <i class="fas fa-shield-alt"></i> Security Scan
-                        </button>
-                        <button class="admin-btn danger" onclick="alert('System alerts coming soon!')">
-                            <i class="fas fa-bell"></i> System Alerts
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- System Activities & Monitoring -->
-        <div class="row">
-            <div class="col-lg-8 mb-4">
-                <div class="commission-card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-history"></i> Recent System Activities</h5>
-                        <span class="badge bg-light text-dark">Live Monitor</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="activity-timeline">
-                            {% if recent_activities %}
-                                {% for activity in recent_activities %}
-                                    <div class="activity-item">
-                                        <div class="activity-icon activity-{{ activity.activity_type|default:'system' }}">
-                                            <i class="fas fa-{{ activity.icon|default:'cog' }}"></i>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1">{{ activity.description|default:'System Activity' }}</h6>
-                                            <p class="small text-muted mb-0">{{ activity.user.get_full_name|default:'System' }} - {{ activity.created_at|default:'Just now'|date:'M d, Y g:i A' }}</p>
-                                        </div>
-                                        <span class="badge bg-primary">{{ activity.get_activity_type_display|default:'System' }}</span>
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <!-- Mock data for demonstration -->
-                                <div class="activity-item">
-                                    <div class="activity-icon activity-election">
-                                        <i class="fas fa-poll"></i>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-1">New election created: City Council 2025</h6>
-                                        <p class="small text-muted mb-0">Commissioner Smith - Dec 1, 2025 2:30 PM</p>
-                                    </div>
-                                    <span class="badge bg-primary">Election</span>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon activity-user">
-                                        <i class="fas fa-user-check"></i>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-1">Candidate application approved: Jane Doe</h6>
-                                        <p class="small text-muted mb-0">Commissioner Johnson - Dec 1, 2025 1:15 PM</p>
-                                    </div>
-                                    <span class="badge bg-success">Approval</span>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon activity-security">
-                                        <i class="fas fa-shield-alt"></i>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-1">Security audit completed successfully</h6>
-                                        <p class="small text-muted mb-0">System - Dec 1, 2025 12:00 PM</p>
-                                    </div>
-                                    <span class="badge bg-warning">Security</span>
-                                </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon activity-system">
-                                        <i class="fas fa-database"></i>
-                                    </div>
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-1">Database backup completed</h6>
-                                        <p class="small text-muted mb-0">System - Dec 1, 2025 11:30 AM</p>
-                                    </div>
-                                    <span class="badge bg-info">System</span>
-                                </div>
-                            {% endif %}
+            <!-- Election Progress -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie"></i>
+                    <h3>Election Progress</h3>
+                </div>
+                
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div class="progress-ring">
+                        <svg>
+                            <circle class="bg" cx="40" cy="40" r="36"></circle>
+                            <circle class="progress" cx="40" cy="40" r="36" 
+                                    stroke-dasharray="226" 
+                                    stroke-dashoffset="68"></circle>
+                        </svg>
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: bold; font-size: 1.2rem;">
+                            70%
                         </div>
+                    </div>
+                    <p style="color: rgba(255,255,255,0.8); margin: 0;">Overall Completion</p>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="color: rgba(255,255,255,0.8);">Voter Registration</span>
+                        <span style="color: white;">92%</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px;">
+                        <div style="background: var(--success-color); height: 100%; width: 92%; border-radius: 3px;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="color: rgba(255,255,255,0.8);">Candidate Approval</span>
+                        <span style="color: white;">78%</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px;">
+                        <div style="background: var(--warning-color); height: 100%; width: 78%; border-radius: 3px;"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="color: rgba(255,255,255,0.8);">System Readiness</span>
+                        <span style="color: white;">85%</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px;">
+                        <div style="background: var(--info-color); height: 100%; width: 85%; border-radius: 3px;"></div>
                     </div>
                 </div>
             </div>
-            
-            <div class="col-lg-4 mb-4">
-                <div class="commission-card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-crown"></i> Commission Profile</h5>
+
+            <!-- Recent Decisions -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-gavel"></i>
+                    <h3>Recent Decisions</h3>
+                </div>
+                
+                <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+                    <div style="padding: 0.75rem; background: rgba(39,174,96,0.1); border-radius: 6px; margin-bottom: 0.75rem; border-left: 3px solid var(--success-color);">
+                        <strong>Approved</strong><br>
+                        Presidential Debate Schedule - October 10, 2024
                     </div>
-                    <div class="card-body">
-                        <div class="text-center mb-3">
-                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                                <i class="fas fa-crown fa-2x text-muted"></i>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="text-muted">Commissioner Name</label>
-                            <p class="h6">{{ user.get_full_name }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="text-muted">Role</label>
-                            <p class="h6">{{ user.get_user_type_display }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="text-muted">Commission ID</label>
-                            <p class="h6">COM-{{ user.id|stringformat:"05d" }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="text-muted">Position</label>
-                            <p class="h6">{{ profile.position|default:"Chief Commissioner" }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="text-muted">Jurisdiction</label>
-                            <p class="h6">{{ profile.jurisdiction|default:"National" }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="text-muted">Term Started</label>
-                            <p class="h6">{{ profile.appointment_date|default:user.date_joined|date:"F d, Y" }}</p>
-                        </div>
-                        <a href="{% url 'accounts:profile' %}" class="admin-btn">
-                            <i class="fas fa-edit"></i> Edit Profile
-                        </a>
+                    
+                    <div style="padding: 0.75rem; background: rgba(231,76,60,0.1); border-radius: 6px; margin-bottom: 0.75rem; border-left: 3px solid #e74c3c;">
+                        <strong>Rejected</strong><br>
+                        Campaign Finance Violation - Candidate XYZ
+                    </div>
+                    
+                    <div style="padding: 0.75rem; background: rgba(52,152,219,0.1); border-radius: 6px; border-left: 3px solid var(--info-color);">
+                        <strong>Under Review</strong><br>
+                        Polling Station Accessibility Compliance
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Add interactivity
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle candidate approval/rejection
+    document.querySelectorAll('.btn-success, .btn-danger').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const action = this.classList.contains('btn-success') ? 'approve' : 'reject';
+            const candidateItem = this.closest('.candidate-item');
+            const name = candidateItem.querySelector('h4').textContent;
+            
+            if (confirm(`Are you sure you want to ${action} the candidate application for ${name}?`)) {
+                // Simulate processing
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    const statusBadge = candidateItem.querySelector('.status-badge');
+                    if (action === 'approve') {
+                        statusBadge.className = 'status-badge status-approved';
+                        statusBadge.textContent = 'Approved';
+                        candidateItem.classList.add('approved');
+                    } else {
+                        statusBadge.className = 'status-badge status-rejected';
+                        statusBadge.textContent = 'Rejected';
+                        candidateItem.classList.add('rejected');
+                    }
+                    
+                    // Remove action buttons
+                    this.parentElement.remove();
+                }, 1500);
+            }
+        });
+    });
+    
+    // Handle election monitoring
+    document.querySelectorAll('.btn-outline-light').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const text = this.textContent.trim();
+            
+            if (text.includes('Monitor')) {
+                alert('Opening Election Monitoring Dashboard...\n\nReal-time features:\n- Live vote counting\n- Polling station status\n- Security alerts\n- Voter turnout statistics');
+            } else if (text.includes('Results')) {
+                alert('Opening Election Results Dashboard...\n\nFeatures:\n- Real-time results\n- Candidate performance\n- Geographic breakdown\n- Statistical analysis');
+            } else if (text.includes('Review')) {
+                const candidateItem = this.closest('.candidate-item');
+                const name = candidateItem.querySelector('h4').textContent;
+                alert(`Opening detailed review for ${name}...\n\nReview includes:\n- Application documents\n- Background verification\n- Financial disclosures\n- Eligibility assessment`);
+            }
+        });
+    });
+    
+    console.log('Electoral Commission Dashboard loaded');
+});
+</script>
 {% endblock %}

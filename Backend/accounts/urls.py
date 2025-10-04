@@ -12,6 +12,7 @@ app_name = 'accounts'
 urlpatterns = [
     # Web Authentication Views
     path('login/', web_views.login_view, name='login'),
+    path('role-login/', web_views.role_login_view, name='role_login'),
     path('register/', web_views.register_view, name='register'),
     path('logout/', web_views.logout_view, name='logout'),
     path('profile/', web_views.profile_view, name='profile'),
@@ -20,6 +21,7 @@ urlpatterns = [
     
     # Dashboard Views
     path('dashboard/', web_views.dashboard_view, name='dashboard'),
+    path('dashboard/superadmin/', web_views.superadmin_dashboard_view, name='superadmin_dashboard'),
     path('dashboard/citizen/', web_views.citizen_dashboard_view, name='citizen_dashboard'),
     path('dashboard/voter/', web_views.voter_dashboard_view, name='voter_dashboard'),
     path('dashboard/candidate/', web_views.candidate_dashboard_view, name='candidate_dashboard'),

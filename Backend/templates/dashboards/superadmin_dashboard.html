@@ -1,0 +1,532 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Super Admin Dashboard - COMITIA{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+:root {
+    --primary-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    --accent-color: #e94560;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --info-color: #3498db;
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.15);
+}
+
+body {
+    background: var(--primary-gradient);
+    min-height: 100vh;
+    color: #ecf0f1;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-container {
+    padding: 2rem 1rem;
+}
+
+/* Header */
+.admin-header {
+    background: rgba(233, 69, 96, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(233, 69, 96, 0.3);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.admin-header h1 {
+    color: var(--accent-color);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.admin-header p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-color), var(--info-color));
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.stat-icon.users { background: rgba(52, 152, 219, 0.2); color: #3498db; }
+.stat-icon.voters { background: rgba(39, 174, 96, 0.2); color: #27ae60; }
+.stat-icon.candidates { background: rgba(243, 156, 18, 0.2); color: #f39c12; }
+.stat-icon.elections { background: rgba(233, 69, 96, 0.2); color: #e94560; }
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+}
+
+/* Dashboard Cards Grid */
+.dashboards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.dashboard-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+    display: block;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--accent-color);
+    box-shadow: 0 15px 40px rgba(233, 69, 96, 0.4);
+    color: white;
+}
+
+.dashboard-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin: 0 auto 1.5rem;
+}
+
+.dashboard-icon.citizen { background: linear-gradient(135deg, #667eea, #764ba2); }
+.dashboard-icon.voter { background: linear-gradient(135deg, #11998e, #38ef7d); }
+.dashboard-icon.candidate { background: linear-gradient(135deg, #f093fb, #f5576c); }
+.dashboard-icon.official { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.dashboard-icon.commission { background: linear-gradient(135deg, #fa709a, #fee140); }
+.dashboard-icon.system { background: linear-gradient(135deg, #30cfd0, #330867); }
+
+.dashboard-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    text-align: center;
+}
+
+.dashboard-description {
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.dashboard-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.badge-active { background: rgba(39, 174, 96, 0.2); color: #27ae60; }
+.badge-pending { background: rgba(243, 156, 18, 0.2); color: #f39c12; }
+
+/* Quick Actions */
+.quick-actions {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.quick-actions h3 {
+    color: white;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.action-btn {
+    background: rgba(233, 69, 96, 0.1);
+    border: 2px solid rgba(233, 69, 96, 0.3);
+    color: white;
+    padding: 1rem;
+    border-radius: 10px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.action-btn:hover {
+    background: rgba(233, 69, 96, 0.2);
+    border-color: var(--accent-color);
+    transform: translateX(5px);
+    color: white;
+}
+
+.action-btn i {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+}
+
+/* System Status */
+.system-status {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
+    padding: 2rem;
+}
+
+.status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.status-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+.status-value {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.status-indicator.online { background: #27ae60; }
+.status-indicator.warning { background: #f39c12; }
+.status-indicator.offline { background: #e74c3c; }
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .dashboards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container dashboard-container">
+    <!-- Admin Header -->
+    <div class="admin-header">
+        <h1><i class="fas fa-crown"></i> Super Admin Dashboard</h1>
+        <p>Complete system control and monitoring</p>
+    </div>
+
+    <!-- System Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon users">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value">{{ total_users|default:0 }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon voters">
+                <i class="fas fa-vote-yea"></i>
+            </div>
+            <div class="stat-value">{{ total_voters|default:0 }}</div>
+            <div class="stat-label">Registered Voters</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon candidates">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="stat-value">{{ total_candidates|default:0 }}</div>
+            <div class="stat-label">Active Candidates</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon elections">
+                <i class="fas fa-poll"></i>
+            </div>
+            <div class="stat-value">{{ total_elections|default:0 }}</div>
+            <div class="stat-label">Total Elections</div>
+        </div>
+    </div>
+
+    <!-- Dashboard Access Cards -->
+    <h2 class="text-white mb-4"><i class="fas fa-th-large"></i> Access Dashboards</h2>
+    <div class="dashboards-grid">
+        <!-- Citizen Dashboard -->
+        <a href="{% url 'accounts:citizen_dashboard' %}" class="dashboard-card">
+            <div class="dashboard-icon citizen">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="dashboard-title">Citizen Dashboard</div>
+            <div class="dashboard-description">
+                View citizen profiles, applications, and role transitions
+            </div>
+            <div class="text-center">
+                <span class="dashboard-badge badge-active">
+                    <i class="fas fa-check-circle"></i> Active
+                </span>
+            </div>
+        </a>
+
+        <!-- Voter Dashboard -->
+        <a href="{% url 'accounts:voter_dashboard' %}" class="dashboard-card">
+            <div class="dashboard-icon voter">
+                <i class="fas fa-vote-yea"></i>
+            </div>
+            <div class="dashboard-title">Voter Dashboard</div>
+            <div class="dashboard-description">
+                Access voting interface, election participation, and vote history
+            </div>
+            <div class="text-center">
+                <span class="dashboard-badge badge-active">
+                    <i class="fas fa-check-circle"></i> Active
+                </span>
+            </div>
+        </a>
+
+        <!-- Candidate Dashboard -->
+        <a href="{% url 'accounts:candidate_dashboard' %}" class="dashboard-card">
+            <div class="dashboard-icon candidate">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="dashboard-title">Candidate Dashboard</div>
+            <div class="dashboard-description">
+                Manage campaigns, view analytics, and track election performance
+            </div>
+            <div class="text-center">
+                <span class="dashboard-badge badge-active">
+                    <i class="fas fa-check-circle"></i> Active
+                </span>
+            </div>
+        </a>
+
+        <!-- Voter Official Dashboard -->
+        <a href="{% url 'accounts:voter_official_dashboard' %}" class="dashboard-card">
+            <div class="dashboard-icon official">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="dashboard-title">Voter Official Dashboard</div>
+            <div class="dashboard-description">
+                Process voter registrations, verify biometrics, and manage polling stations
+            </div>
+            <div class="text-center">
+                <span class="dashboard-badge badge-active">
+                    <i class="fas fa-check-circle"></i> Active
+                </span>
+            </div>
+        </a>
+
+        <!-- Electoral Commission Dashboard -->
+        <a href="{% url 'accounts:electoral_commission_dashboard' %}" class="dashboard-card">
+            <div class="dashboard-icon commission">
+                <i class="fas fa-landmark"></i>
+            </div>
+            <div class="dashboard-title">Electoral Commission Dashboard</div>
+            <div class="dashboard-description">
+                Oversee elections, approve candidates, and manage electoral processes
+            </div>
+            <div class="text-center">
+                <span class="dashboard-badge badge-active">
+                    <i class="fas fa-check-circle"></i> Active
+                </span>
+            </div>
+        </a>
+
+        <!-- System Administration -->
+        <a href="/admin/" class="dashboard-card">
+            <div class="dashboard-icon system">
+                <i class="fas fa-cogs"></i>
+            </div>
+            <div class="dashboard-title">Django Admin</div>
+            <div class="dashboard-description">
+                Direct database access, user management, and system configuration
+            </div>
+            <div class="text-center">
+                <span class="dashboard-badge badge-active">
+                    <i class="fas fa-database"></i> Database
+                </span>
+            </div>
+        </a>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+        <div class="action-buttons">
+            <a href="{% url 'accounts:role_login' %}" class="action-btn" style="border-color: var(--accent-color); background: rgba(233, 69, 96, 0.2);">
+                <i class="fas fa-user-cog"></i>
+                <span>Role-Based Login</span>
+            </a>
+            <a href="/admin/accounts/user/" class="action-btn">
+                <i class="fas fa-users-cog"></i>
+                <span>Manage Users</span>
+            </a>
+            <a href="/admin/elections/election/" class="action-btn">
+                <i class="fas fa-poll-h"></i>
+                <span>Manage Elections</span>
+            </a>
+            <a href="/admin/accounts/candidateprofile/" class="action-btn">
+                <i class="fas fa-user-check"></i>
+                <span>Approve Candidates</span>
+            </a>
+            <a href="/admin/accounts/voterprofile/" class="action-btn">
+                <i class="fas fa-id-card"></i>
+                <span>Verify Voters</span>
+            </a>
+            <a href="/admin/accounts/useractivity/" class="action-btn">
+                <i class="fas fa-history"></i>
+                <span>Activity Logs</span>
+            </a>
+            <a href="/admin/accounts/biometricdata/" class="action-btn">
+                <i class="fas fa-fingerprint"></i>
+                <span>Biometric Data</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="system-status">
+        <h3 class="text-white mb-4"><i class="fas fa-server"></i> System Status</h3>
+        
+        <div class="status-item">
+            <span class="status-label">Database Connection</span>
+            <div class="status-value">
+                <span class="status-indicator online"></span>
+                <span style="color: #27ae60;">Online</span>
+            </div>
+        </div>
+
+        <div class="status-item">
+            <span class="status-label">Blockchain Network</span>
+            <div class="status-value">
+                <span class="status-indicator online"></span>
+                <span style="color: #27ae60;">Connected</span>
+            </div>
+        </div>
+
+        <div class="status-item">
+            <span class="status-label">Authentication Service</span>
+            <div class="status-value">
+                <span class="status-indicator online"></span>
+                <span style="color: #27ae60;">Active</span>
+            </div>
+        </div>
+
+        <div class="status-item">
+            <span class="status-label">File Storage</span>
+            <div class="status-value">
+                <span class="status-indicator online"></span>
+                <span style="color: #27ae60;">Available</span>
+            </div>
+        </div>
+
+        <div class="status-item">
+            <span class="status-label">Last Backup</span>
+            <div class="status-value">
+                <span style="color: rgba(255,255,255,0.8);">2 hours ago</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Auto-refresh stats every 30 seconds
+setInterval(function() {
+    console.log('Stats would refresh here in production');
+}, 30000);
+
+// Log dashboard access
+console.log('Super Admin Dashboard loaded');
+console.log('User:', '{{ user.username }}');
+console.log('Access Level: Super Admin');
+</script>
+{% endblock %}

@@ -4,423 +4,598 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-.official-dashboard {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+:root {
+    --primary-color: #2c3e50;
+    --accent-color: #e94560;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --info-color: #3498db;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+body {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
     min-height: 100vh;
-    padding: 2rem 0;
+    color: white;
+}
+
+.dashboard-container {
+    padding: 2rem 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .dashboard-header {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 15px;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
+    text-align: center;
 }
 
-.official-card {
-    background: rgba(255, 255, 255, 0.95);
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    height: 100%;
-    backdrop-filter: blur(10px);
+.dashboard-header h1 {
+    color: var(--accent-color);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
 }
 
-.official-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-
-.official-card .card-header {
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
-    color: white;
-    border: none;
-    border-radius: 20px 20px 0 0;
-    padding: 1.5rem;
+.dashboard-header p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
 }
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
 .stat-card {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
     padding: 1.5rem;
-    text-align: center;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent-color);
 }
 
 .stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
 }
 
 .stat-icon {
-    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: white;
 }
 
-.official-btn {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border: none;
+.stat-icon.pending { background: linear-gradient(135deg, #f39c12, #e67e22); }
+.stat-icon.approved { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+.stat-icon.rejected { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+.stat-icon.total { background: linear-gradient(135deg, #3498db, #2980b9); }
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
     color: white;
-    padding: 0.8rem 2rem;
-    border-radius: 50px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    width: 100%;
     margin-bottom: 0.5rem;
 }
 
-.official-btn:hover {
+.stat-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.card-header h3 {
     color: white;
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
 }
 
-.official-btn.success {
-    background: linear-gradient(135deg, #10b981, #34d399);
-}
-
-.official-btn.danger {
-    background: linear-gradient(135deg, #ef4444, #f87171);
-}
-
-.official-btn.warning {
-    background: linear-gradient(135deg, #f59e0b, #fbbf24);
+.card-header i {
+    color: var(--accent-color);
+    font-size: 1.5rem;
 }
 
 .registration-item {
-    background: #f8fafc;
-    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
     padding: 1rem;
     margin-bottom: 1rem;
-    border-left: 4px solid #4facfe;
+    border-left: 3px solid var(--warning-color);
 }
 
-.biometric-scanner {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+.registration-item.approved {
+    border-left-color: var(--success-color);
+}
+
+.registration-item.rejected {
+    border-left-color: #e74c3c;
+}
+
+.registration-item h4 {
     color: white;
-    border-radius: 15px;
-    padding: 1.5rem;
-    text-align: center;
-    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
 }
 
-.processing-queue {
-    max-height: 400px;
-    overflow-y: auto;
+.registration-item p {
+    color: rgba(255, 255, 255, 0.7);
+    margin: 0;
+    font-size: 0.9rem;
 }
 
-.queue-item {
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-pending { background: rgba(243, 156, 18, 0.2); color: #f39c12; }
+.status-approved { background: rgba(39, 174, 96, 0.2); color: #27ae60; }
+.status-rejected { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+
+.btn-primary {
+    background: var(--accent-color);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: #d63850;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(233, 69, 96, 0.4);
+}
+
+.btn-success {
+    background: var(--success-color);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    background: #229954;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: #e74c3c;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+    transform: translateY(-1px);
+}
+
+.btn-outline-light {
+    border-color: var(--glass-border);
+    color: white;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: white;
+    color: white;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.action-buttons {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1rem;
-    border-bottom: 1px solid #e2e8f0;
-    transition: background-color 0.3s ease;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
 }
-
-.queue-item:hover {
-    background-color: #f8fafc;
-}
-
-.priority-high { border-left: 4px solid #ef4444; }
-.priority-medium { border-left: 4px solid #f59e0b; }
-.priority-low { border-left: 4px solid #10b981; }
 
 @media (max-width: 768px) {
-    .official-dashboard {
-        padding: 1rem 0;
+    .content-grid {
+        grid-template-columns: 1fr;
     }
     
-    .dashboard-header {
-        padding: 1.5rem;
-        margin-bottom: 1rem;
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
     }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="official-dashboard">
-    <div class="container">
-        <!-- Dashboard Header -->
-        <div class="dashboard-header">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1><i class="fas fa-user-cog"></i> Voter Official Dashboard</h1>
-                    <p class="lead">Welcome, {{ user.get_full_name }}! Manage voter registrations and biometric verification.</p>
+<div class="dashboard-container">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <h1><i class="fas fa-user-shield"></i> Voter Official Dashboard</h1>
+        <p>Process voter registrations and manage electoral operations</p>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon pending">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-value">24</div>
+            <div class="stat-label">Pending Applications</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon approved">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-value">156</div>
+            <div class="stat-label">Approved Today</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon rejected">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="stat-value">8</div>
+            <div class="stat-label">Rejected Today</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon total">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value">3,247</div>
+            <div class="stat-label">Total Processed</div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Pending Registrations -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>Pending Voter Registrations</h3>
                 </div>
-                <div class="col-md-4 text-md-right">
-                    <span class="badge bg-primary px-3 py-2">
-                        <i class="fas fa-shield-alt"></i> Official Access
-                    </span>
+                
+                <div class="registration-item">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4>John Doe</h4>
+                            <p><strong>National ID:</strong> 1234567890</p>
+                            <p><strong>Address:</strong> 123 Main St, City Center</p>
+                            <p><strong>Submitted:</strong> 2 hours ago</p>
+                        </div>
+                        <span class="status-badge status-pending">Pending</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success btn-sm">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="btn btn-danger btn-sm">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                        <button class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-eye"></i> View Details
+                        </button>
+                    </div>
+                </div>
+
+                <div class="registration-item">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4>Sarah Johnson</h4>
+                            <p><strong>National ID:</strong> 0987654321</p>
+                            <p><strong>Address:</strong> 456 Oak Ave, Downtown</p>
+                            <p><strong>Submitted:</strong> 4 hours ago</p>
+                        </div>
+                        <span class="status-badge status-pending">Pending</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success btn-sm">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="btn btn-danger btn-sm">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                        <button class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-eye"></i> View Details
+                        </button>
+                    </div>
+                </div>
+
+                <div class="registration-item">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <h4>Michael Brown</h4>
+                            <p><strong>National ID:</strong> 1122334455</p>
+                            <p><strong>Address:</strong> 789 Pine St, Suburb</p>
+                            <p><strong>Submitted:</strong> 6 hours ago</p>
+                        </div>
+                        <span class="status-badge status-pending">Pending</span>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success btn-sm">
+                            <i class="fas fa-check"></i> Approve
+                        </button>
+                        <button class="btn btn-danger btn-sm">
+                            <i class="fas fa-times"></i> Reject
+                        </button>
+                        <button class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-eye"></i> View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-history"></i>
+                    <h3>Recent Activities</h3>
+                </div>
+                
+                <div class="registration-item approved">
+                    <h4>Approved Registration: Emma Wilson</h4>
+                    <p>Voter ID: VTR87654321 | Processed 30 minutes ago</p>
+                </div>
+
+                <div class="registration-item approved">
+                    <h4>Approved Registration: David Lee</h4>
+                    <p>Voter ID: VTR12345678 | Processed 1 hour ago</p>
+                </div>
+
+                <div class="registration-item rejected">
+                    <h4>Rejected Registration: Invalid Documents</h4>
+                    <p>Application ID: APP98765432 | Processed 2 hours ago</p>
                 </div>
             </div>
         </div>
 
-        <!-- Stats Overview -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-clock"></i>
+        <!-- Sidebar Content -->
+        <div class="sidebar-content">
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Quick Actions</h3>
                 </div>
-                <h3>{{ registration_stats.pending_count|default:"0" }}</h3>
-                <p>Pending Applications</p>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-check-circle"></i>
+                
+                <div class="quick-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Registration
+                    </button>
+                    <button class="btn btn-outline-light">
+                        <i class="fas fa-search"></i> Search Voters
+                    </button>
+                    <button class="btn btn-outline-light">
+                        <i class="fas fa-file-export"></i> Export Report
+                    </button>
+                    <button class="btn btn-outline-light">
+                        <i class="fas fa-cog"></i> Settings
+                    </button>
                 </div>
-                <h3>{{ registration_stats.approved_today|default:"0" }}</h3>
-                <p>Approved Today</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-times-circle"></i>
-                </div>
-                <h3>{{ registration_stats.rejected_today|default:"0" }}</h3>
-                <p>Rejected Today</p>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h3>{{ registration_stats.total_processed|default:"0" }}</h3>
-                <p>Total Processed</p>
-            </div>
-        </div>
 
-        <div class="row">
-            <!-- Processing Queue -->
-            <div class="col-lg-8 mb-4">
-                <div class="official-card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-list-alt"></i> Registration Processing Queue</h5>
-                        <span class="badge bg-light text-dark">{{ pending_registrations|length|default:"0" }} Pending</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="processing-queue">
-                            {% if pending_registrations %}
-                                {% for registration in pending_registrations %}
-                                    <div class="queue-item priority-high">
-                                        <div>
-                                            <h6 class="mb-1">{{ registration.user.get_full_name|default:"John Doe" }}</h6>
-                                            <small class="text-muted">Applied: {{ registration.created_at|default:"Dec 1, 2025"|date:"M d, Y" }}</small>
-                                            <br><small class="text-muted">ID: REG-{{ forloop.counter|stringformat:"03d" }}</small>
-                                        </div>
-                                        <div class="btn-group">
-                                            <button class="btn btn-sm btn-success" onclick="alert('Approval system coming soon!')">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-danger" onclick="alert('Rejection system coming soon!')">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-info" onclick="alert('Details view coming soon!')">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            {% else %}
-                                <!-- Mock data for demonstration -->
-                                <div class="queue-item priority-high">
-                                    <div>
-                                        <h6 class="mb-1">Alice Johnson</h6>
-                                        <small class="text-muted">Applied: Dec 1, 2025</small>
-                                        <br><small class="text-muted">ID: REG-001</small>
-                                    </div>
-                                    <div class="btn-group">
-                                        <button class="btn btn-sm btn-success" onclick="alert('Approval system coming soon!')">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" onclick="alert('Rejection system coming soon!')">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-info" onclick="alert('Details view coming soon!')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="queue-item priority-medium">
-                                    <div>
-                                        <h6 class="mb-1">Bob Smith</h6>
-                                        <small class="text-muted">Applied: Nov 30, 2025</small>
-                                        <br><small class="text-muted">ID: REG-002</small>
-                                    </div>
-                                    <div class="btn-group">
-                                        <button class="btn btn-sm btn-success" onclick="alert('Approval system coming soon!')">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" onclick="alert('Rejection system coming soon!')">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-info" onclick="alert('Details view coming soon!')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="queue-item priority-low">
-                                    <div>
-                                        <h6 class="mb-1">Carol Davis</h6>
-                                        <small class="text-muted">Applied: Nov 29, 2025</small>
-                                        <br><small class="text-muted">ID: REG-003</small>
-                                    </div>
-                                    <div class="btn-group">
-                                        <button class="btn btn-sm btn-success" onclick="alert('Approval system coming soon!')">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" onclick="alert('Rejection system coming soon!')">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-info" onclick="alert('Details view coming soon!')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
+            <!-- Official Information -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-id-badge"></i>
+                    <h3>Official Information</h3>
+                </div>
+                
+                <div style="color: rgba(255,255,255,0.8); line-height: 1.6;">
+                    <p><strong>Official ID:</strong> {{ profile.official_id|default:"OFF12345678" }}</p>
+                    <p><strong>Assigned Region:</strong> {{ profile.assigned_region|default:"Central District" }}</p>
+                    <p><strong>Registration Center:</strong> {{ profile.registration_center|default:"Main Office" }}</p>
+                    <p><strong>Status:</strong> 
+                        <span class="status-badge status-approved">Active</span>
+                    </p>
                 </div>
             </div>
-            
-            <div class="col-lg-4 mb-4">
-                <div class="official-card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-tools"></i> Quick Tools</h5>
-                    </div>
-                    <div class="card-body">
-                        <button class="official-btn success" onclick="alert('Batch approval coming soon!')">
-                            <i class="fas fa-check-double"></i> Batch Approve
-                        </button>
-                        <button class="official-btn warning" onclick="alert('Search functionality coming soon!')">
-                            <i class="fas fa-search"></i> Search Applications
-                        </button>
-                        <button class="official-btn" onclick="alert('Reports coming soon!')">
-                            <i class="fas fa-chart-bar"></i> Generate Report
-                        </button>
-                        <button class="official-btn" onclick="alert('Export functionality coming soon!')">
-                            <i class="fas fa-download"></i> Export Data
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Biometric & Profile Section -->
-        <div class="row">
-            <div class="col-lg-8 mb-4">
-                <div class="official-card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-fingerprint"></i> Biometric Verification Center</h5>
+            <!-- Daily Statistics -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie"></i>
+                    <h3>Today's Statistics</h3>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="color: rgba(255,255,255,0.8);">Applications Processed</span>
+                        <span style="color: white;">164</span>
                     </div>
-                    <div class="card-body">
-                        <div class="biometric-scanner">
-                            <h6><i class="fas fa-scan"></i> Biometric Scanner Ready</h6>
-                            <p class="mb-3">Advanced biometric verification system for secure voter registration</p>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="text-center">
-                                        <i class="fas fa-camera fa-2x mb-2"></i>
-                                        <p class="small">Facial Recognition</p>
-                                        <span class="badge bg-success">Online</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="text-center">
-                                        <i class="fas fa-fingerprint fa-2x mb-2"></i>
-                                        <p class="small">Fingerprint Scanner</p>
-                                        <span class="badge bg-success">Online</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="text-center">
-                                        <i class="fas fa-eye fa-2x mb-2"></i>
-                                        <p class="small">Iris Scanner</p>
-                                        <span class="badge bg-warning">Offline</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row mt-3">
-                            <div class="col-md-6">
-                                <button class="official-btn success" onclick="alert('Face capture coming soon!')">
-                                    <i class="fas fa-camera"></i> Capture Face Data
-                                </button>
-                                <button class="official-btn" onclick="alert('Fingerprint capture coming soon!')">
-                                    <i class="fas fa-fingerprint"></i> Capture Fingerprint
-                                </button>
-                            </div>
-                            <div class="col-md-6">
-                                <button class="official-btn warning" onclick="alert('Identity verification coming soon!')">
-                                    <i class="fas fa-search"></i> Verify Identity
-                                </button>
-                                <button class="official-btn" onclick="alert('Biometric matching coming soon!')">
-                                    <i class="fas fa-check-double"></i> Match Biometrics
-                                </button>
-                            </div>
-                        </div>
+                    <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px;">
+                        <div style="background: var(--success-color); height: 100%; width: 82%; border-radius: 3px;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="color: rgba(255,255,255,0.8);">Approval Rate</span>
+                        <span style="color: white;">95%</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px;">
+                        <div style="background: var(--info-color); height: 100%; width: 95%; border-radius: 3px;"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="color: rgba(255,255,255,0.8);">Efficiency Score</span>
+                        <span style="color: white;">88%</span>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px;">
+                        <div style="background: var(--accent-color); height: 100%; width: 88%; border-radius: 3px;"></div>
                     </div>
                 </div>
             </div>
-            
-            <div class="col-lg-4 mb-4">
-                <div class="official-card">
-                    <div class="card-header">
-                        <h5><i class="fas fa-user-circle"></i> Official Profile</h5>
+
+            <!-- Notifications -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-bell"></i>
+                    <h3>Notifications</h3>
+                </div>
+                
+                <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+                    <div style="padding: 0.75rem; background: rgba(243,156,18,0.1); border-radius: 6px; margin-bottom: 0.75rem; border-left: 3px solid var(--warning-color);">
+                        <strong>System Update</strong><br>
+                        New biometric verification system will be deployed tomorrow.
                     </div>
-                    <div class="card-body">
-                        <div class="text-center mb-3">
-                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                                <i class="fas fa-user-shield fa-2x text-muted"></i>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="text-muted">Full Name</label>
-                            <p class="h6">{{ user.get_full_name }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="text-muted">Role</label>
-                            <p class="h6">{{ user.get_user_type_display }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="text-muted">Official ID</label>
-                            <p class="h6">OFF-{{ user.id|stringformat:"05d" }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="text-muted">Registration Center</label>
-                            <p class="h6">{{ profile.registration_center|default:"Central Registration Office" }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="text-muted">Assigned Region</label>
-                            <p class="h6">{{ profile.assigned_region|default:"District 1" }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="text-muted">Active Since</label>
-                            <p class="h6">{{ user.date_joined|date:"F d, Y" }}</p>
-                        </div>
-                        <a href="{% url 'accounts:profile' %}" class="official-btn">
-                            <i class="fas fa-edit"></i> Edit Profile
-                        </a>
+                    
+                    <div style="padding: 0.75rem; background: rgba(52,152,219,0.1); border-radius: 6px; margin-bottom: 0.75rem; border-left: 3px solid var(--info-color);">
+                        <strong>Training Session</strong><br>
+                        Mandatory training on new procedures scheduled for Friday.
+                    </div>
+                    
+                    <div style="padding: 0.75rem; background: rgba(39,174,96,0.1); border-radius: 6px; border-left: 3px solid var(--success-color);">
+                        <strong>Target Achieved</strong><br>
+                        Monthly registration target exceeded by 15%.
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Add interactivity
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle approval/rejection buttons
+    document.querySelectorAll('.btn-success, .btn-danger').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const action = this.classList.contains('btn-success') ? 'approve' : 'reject';
+            const registrationItem = this.closest('.registration-item');
+            const name = registrationItem.querySelector('h4').textContent;
+            
+            if (confirm(`Are you sure you want to ${action} the registration for ${name}?`)) {
+                // Simulate processing
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    registrationItem.style.opacity = '0.5';
+                    registrationItem.style.transform = 'translateX(20px)';
+                    
+                    setTimeout(() => {
+                        registrationItem.remove();
+                    }, 300);
+                }, 1000);
+            }
+        });
+    });
+    
+    // Handle view details buttons
+    document.querySelectorAll('.btn-outline-light').forEach(btn => {
+        if (btn.textContent.includes('View Details')) {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const registrationItem = this.closest('.registration-item');
+                const name = registrationItem.querySelector('h4').textContent;
+                alert(`Viewing details for ${name}\n\nThis would open a detailed view with:\n- Complete application form\n- Uploaded documents\n- Biometric data\n- Verification status`);
+            });
+        }
+    });
+    
+    console.log('Voter Official Dashboard loaded');
+});
+</script>
 {% endblock %}

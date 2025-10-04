@@ -1,162 +1,782 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <div class="dashboard-header">
-                <h1><i class="fas fa-arrow-up"></i> Role Transition</h1>
-                <p class="lead">Upgrade your account to access additional features</p>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-user-cog"></i> Current Status</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="current-role">
-                                <h6>Current Role: <span class="badge badge-primary">{{ user.get_user_type_display }}</span></h6>
-                                <p class="text-muted">
-                                    {% if user.user_type == 'citizen' %}
-                                        As a citizen, you can view public information and apply for voter registration or candidacy.
-                                    {% elif user.user_type == 'voter' %}
-                                        As a registered voter, you can participate in elections and apply for candidacy.
-                                    {% elif user.user_type == 'candidate' %}
-                                        As a candidate, you can manage your campaign and participate in elections.
-                                    {% endif %}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    {% if available_roles %}
-                    <div class="card mt-3">
-                        <div class="card-header">
-                            <h5><i class="fas fa-plus-circle"></i> Available Role Transitions</h5>
-                        </div>
-                        <div class="card-body">
-                            <form method="post" action="{% url 'accounts:role_transition' %}">
-                                {% csrf_token %}
-                                
-                                {% for role in available_roles %}
-                                <div class="role-transition-option">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="new_role" id="role_{{ role.role }}" value="{{ role.role }}">
-                                        <label class="form-check-label" for="role_{{ role.role }}">
-                                            <strong>{{ role.name }}</strong>
-                                        </label>
-                                    </div>
-                                    <p class="text-muted ml-4">{{ role.description }}</p>
-                                    
-                                    {% if role.role == 'voter' %}
-                                    <div class="alert alert-info ml-4">
-                                        <i class="fas fa-info-circle"></i>
-                                        <strong>Requirements:</strong> You will need to visit a Voter Official for biometric verification and identity confirmation.
-                                    </div>
-                                    {% elif role.role == 'candidate' %}
-                                    <div class="alert alert-warning ml-4">
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                        <strong>Requirements:</strong> Your application will be reviewed by the Electoral Commission. Additional documentation may be required.
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                {% endfor %}
-                                
-                                <div class="mt-4">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-paper-plane"></i> Submit Application
-                                    </button>
-                                    <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">
-                                        <i class="fas fa-arrow-left"></i> Back to Profile
-                                    </a>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    {% else %}
-                    <div class="card mt-3">
-                        <div class="card-body text-center">
-                            <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
-                            <h5>No Role Transitions Available</h5>
-                            <p class="text-muted">You have reached the highest available role or no transitions are currently available.</p>
-                            <a href="{% url 'accounts:profile' %}" class="btn btn-primary">
-                                <i class="fas fa-arrow-left"></i> Back to Profile
-                            </a>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-info-circle"></i> Role Information</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="role-info">
-                                <h6><i class="fas fa-users"></i> Citizen</h6>
-                                <p class="small text-muted">Basic access to public information and ability to apply for other roles.</p>
-                            </div>
-                            
-                            <div class="role-info">
-                                <h6><i class="fas fa-vote-yea"></i> Voter</h6>
-                                <p class="small text-muted">Can participate in elections, view results, and verify votes on blockchain.</p>
-                            </div>
-                            
-                            <div class="role-info">
-                                <h6><i class="fas fa-user-tie"></i> Candidate</h6>
-                                <p class="small text-muted">Can run for office, manage campaigns, and access candidate tools.</p>
-                            </div>
-                            
-                            <div class="role-info">
-                                <h6><i class="fas fa-user-cog"></i> Voter Official</h6>
-                                <p class="small text-muted">Manages voter registrations and biometric verification. (By appointment only)</p>
-                            </div>
-                            
-                            <div class="role-info">
-                                <h6><i class="fas fa-crown"></i> Electoral Commission</h6>
-                                <p class="small text-muted">Oversees elections, approves candidates, and manages the system. (By appointment only)</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <style>
-.role-transition-option {
-    padding: 20px;
-    border: 1px solid #ddd;
+body {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    min-height: 100vh;
+    color: #ecf0f1;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+    max-width: 900px;
+    padding: 2rem 1rem;
+}
+
+.page-header {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.page-header h1 {
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+}
+
+.role-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.role-card:hover {
+    border-color: #3498db;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.role-card.selected {
+    border-color: #27ae60;
+    background: rgba(39, 174, 96, 0.2);
+    box-shadow: 0 0 20px rgba(39, 174, 96, 0.3);
+}
+
+.role-card input[type="radio"] {
+    width: 24px;
+    height: 24px;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.role-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.role-header h3 {
+    margin: 0;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.role-description {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 1rem;
+    padding-left: 39px;
+}
+
+.requirements {
+    background: rgba(0, 0, 0, 0.2);
     border-radius: 8px;
-    margin-bottom: 20px;
-    background-color: #f8f9fa;
+    padding: 1rem;
+    margin-left: 39px;
 }
 
-.role-transition-option:hover {
-    border-color: #007bff;
-    background-color: #e3f2fd;
+.requirements h6 {
+    color: white;
+    margin-bottom: 0.75rem;
 }
 
-.role-info {
-    padding: 15px 0;
-    border-bottom: 1px solid #eee;
+.requirements ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-.role-info:last-child {
-    border-bottom: none;
+.requirements li {
+    color: rgba(255, 255, 255, 0.8);
+    padding: 0.25rem 0;
 }
 
-.current-role {
-    padding: 20px;
-    background-color: #e8f5e8;
+.requirements li i {
+    color: #3498db;
+    margin-right: 8px;
+}
+
+.btn-submit {
+    background: #27ae60;
+    border: none;
+    color: white;
+    padding: 1rem 3rem;
     border-radius: 8px;
-    border-left: 4px solid #28a745;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 2rem auto 0;
+}
+
+.btn-submit:hover:not(:disabled) {
+    background: #229954;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+.btn-submit:disabled {
+    background: #7f8c8d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.alert {
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.selected-indicator {
+    display: inline-block;
+    background: #27ae60;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin-left: 10px;
+    font-weight: 600;
+}
+
+/* Step Indicator */
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem 0;
+    gap: 1rem;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.step.active {
+    opacity: 1;
+}
+
+.step.completed {
+    opacity: 1;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.step.active .step-number {
+    background: #3498db;
+    border-color: #3498db;
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+}
+
+.step.completed .step-number {
+    background: #27ae60;
+    border-color: #27ae60;
+}
+
+.step.completed .step-number::before {
+    content: '\f00c';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+.step-label {
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Document Upload */
+.document-upload-card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.document-upload-card:hover {
+    border-color: #3498db;
+    background: rgba(52, 152, 219, 0.1);
+}
+
+.document-upload-card.uploaded {
+    border-style: solid;
+    border-color: #27ae60;
+    background: rgba(39, 174, 96, 0.1);
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: #3498db;
+    margin-bottom: 1rem;
+}
+
+.document-upload-card.uploaded .upload-icon {
+    color: #27ae60;
+}
+
+.file-input {
+    display: none;
+}
+
+.uploaded-file-info {
+    display: none;
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.uploaded-file-info.show {
+    display: block;
+}
+
+.remove-file-btn {
+    background: #e74c3c;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+}
+
+.remove-file-btn:hover {
+    background: #c0392b;
+}
+
+/* Form Fields */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    color: white;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+@media (max-width: 768px) {
+    .step-indicator {
+        gap: 0.5rem;
+    }
+    
+    .step-number {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .step-label {
+        font-size: 0.75rem;
+    }
 }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="fas fa-user-plus"></i> Role Transition Application</h1>
+        <p>Select a role to apply for and submit your application</p>
+    </div>
+
+    <!-- Current Status -->
+    <div class="alert alert-info">
+        <strong><i class="fas fa-info-circle"></i> Current Status:</strong><br>
+        User Type: <strong>{{ user.get_user_type_display }}</strong><br>
+        Verification: <strong>{{ user.get_verification_status_display|default:'Pending' }}</strong>
+    </div>
+
+    <!-- Application Form -->
+    <form method="post" id="roleApplicationForm">
+        {% csrf_token %}
+        
+        <h4 class="text-white mb-3">Select Your Desired Role:</h4>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator" id="stepIndicator">
+            <div class="step active" id="step_1">
+                <span class="step-number">1</span>
+                <span class="step-label">Select Role</span>
+            </div>
+            <div class="step" id="step_2">
+                <span class="step-number">2</span>
+                <span class="step-label">Upload Documents</span>
+            </div>
+            <div class="step" id="step_3">
+                <span class="step-number">3</span>
+                <span class="step-label">Additional Info</span>
+            </div>
+        </div>
+
+        {% if available_roles %}
+            <!-- STEP 1: Role Selection -->
+            <div class="form-step" id="formStep1">
+                <h4 class="text-white mb-3">Step 1: Select Your Desired Role</h4>
+                
+                {% for role in available_roles %}
+                <!-- Role Card -->
+                <div class="role-card" id="card_{{ role.role }}" onclick="selectRoleCard('{{ role.role }}')">
+                    <div class="role-header">
+                        <input type="radio" 
+                               name="new_role" 
+                               value="{{ role.role }}" 
+                               id="radio_{{ role.role }}"
+                               onclick="event.stopPropagation();">
+                        <label for="radio_{{ role.role }}" style="cursor: pointer; margin: 0;">
+                            <h3>
+                                <i class="fas fa-{% if role.role == 'voter' %}vote-yea{% else %}user-tie{% endif %}"></i>
+                                {{ role.name }}
+                            </h3>
+                        </label>
+                        <span class="selected-indicator" id="indicator_{{ role.role }}" style="display: none;">
+                            <i class="fas fa-check"></i> Selected
+                        </span>
+                    </div>
+                    
+                    <div class="role-description">
+                        {{ role.description }}
+                    </div>
+
+                    <div class="requirements">
+                        <h6><i class="fas fa-clipboard-list"></i> Required Documents:</h6>
+                        <ul>
+                            {% if role.role == 'voter' %}
+                                <li><i class="fas fa-check-circle"></i> National ID Card or Passport</li>
+                                <li><i class="fas fa-check-circle"></i> Proof of Residence</li>
+                                <li><i class="fas fa-check-circle"></i> Birth Certificate</li>
+                            {% elif role.role == 'candidate' %}
+                                <li><i class="fas fa-check-circle"></i> National ID Card or Passport</li>
+                                <li><i class="fas fa-check-circle"></i> Educational Certificate</li>
+                                <li><i class="fas fa-check-circle"></i> Criminal Background Check</li>
+                                <li><i class="fas fa-check-circle"></i> Tax Clearance Certificate</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Next Button -->
+                <button type="button" class="btn-submit" id="nextBtn1" onclick="goToStep(2)" disabled>
+                    Next: Upload Documents <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- STEP 2: Document Upload -->
+            <div class="form-step" id="formStep2" style="display: none;">
+                <h4 class="text-white mb-3">Step 2: Upload Required Documents</h4>
+                
+                <div id="documentUploadArea">
+                    <!-- Documents will be dynamically loaded here -->
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                    <button type="button" class="btn-submit" onclick="goToStep(1)" style="background: #7f8c8d; max-width: 200px;">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button type="button" class="btn-submit" id="nextBtn2" onclick="goToStep(3)" style="max-width: 200px;" disabled>
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- STEP 3: Additional Information -->
+            <div class="form-step" id="formStep3" style="display: none;">
+                <h4 class="text-white mb-3">Step 3: Additional Information</h4>
+                
+                <div id="additionalInfoArea">
+                    <!-- Additional fields will be dynamically loaded here -->
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                    <button type="button" class="btn-submit" onclick="goToStep(2)" style="background: #7f8c8d; max-width: 200px;">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </button>
+                    <button type="submit" class="btn-submit" id="submitBtn" style="max-width: 200px;">
+                        <i class="fas fa-paper-plane"></i> Submit Application
+                    </button>
+                </div>
+            </div>
+
+        {% else %}
+            <!-- No Roles Available -->
+            <div class="alert alert-warning">
+                <h5><i class="fas fa-exclamation-triangle"></i> No Role Transitions Available</h5>
+                <p>You have already applied for all available roles or reached the maximum role level.</p>
+                <hr>
+                <small>
+                    <strong>Debug Info:</strong><br>
+                    Current user type: {{ user.user_type }}<br>
+                    User ID: {{ user.id }}<br>
+                    Verification status: {{ user.verification_status|default:'Not set' }}
+                </small>
+            </div>
+            
+            <a href="{% url 'accounts:dashboard' %}" class="btn-submit" style="background: #3498db;">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let selectedRole = null;
+let uploadedDocuments = {};
+let currentStep = 1;
+
+// Document requirements for each role
+const documentRequirements = {
+    voter: [
+        { id: 'national_id', name: 'National ID Card or Passport', icon: 'id-card' },
+        { id: 'proof_of_residence', name: 'Proof of Residence', icon: 'home' },
+        { id: 'birth_certificate', name: 'Birth Certificate', icon: 'certificate' }
+    ],
+    candidate: [
+        { id: 'national_id', name: 'National ID Card or Passport', icon: 'id-card' },
+        { id: 'educational_certificate', name: 'Educational Certificate', icon: 'graduation-cap' },
+        { id: 'criminal_background_check', name: 'Criminal Background Check', icon: 'shield-alt' },
+        { id: 'tax_clearance', name: 'Tax Clearance Certificate', icon: 'receipt' }
+    ]
+};
+
+// Simple and reliable role selection
+function selectRoleCard(role) {
+    console.log('Role selected:', role);
+    selectedRole = role;
+    
+    // Get the radio button
+    const radioButton = document.getElementById('radio_' + role);
+    if (radioButton) {
+        radioButton.checked = true;
+    }
+    
+    // Remove selected class from all cards
+    document.querySelectorAll('.role-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Hide all indicators
+    document.querySelectorAll('.selected-indicator').forEach(indicator => {
+        indicator.style.display = 'none';
+    });
+    
+    // Add selected class to clicked card
+    const selectedCard = document.getElementById('card_' + role);
+    if (selectedCard) {
+        selectedCard.classList.add('selected');
+    }
+    
+    // Show indicator for selected role
+    const indicator = document.getElementById('indicator_' + role);
+    if (indicator) {
+        indicator.style.display = 'inline-block';
+    }
+    
+    // Enable next button
+    const nextBtn1 = document.getElementById('nextBtn1');
+    if (nextBtn1) {
+        nextBtn1.disabled = false;
+    }
+}
+
+// Navigate between steps
+function goToStep(step) {
+    console.log('Going to step:', step);
+    
+    // Hide all steps
+    document.querySelectorAll('.form-step').forEach(formStep => {
+        formStep.style.display = 'none';
+    });
+    
+    // Show target step
+    const targetStep = document.getElementById('formStep' + step);
+    if (targetStep) {
+        targetStep.style.display = 'block';
+    }
+    
+    // Update step indicator
+    document.querySelectorAll('.step').forEach((stepEl, index) => {
+        stepEl.classList.remove('active', 'completed');
+        if (index + 1 < step) {
+            stepEl.classList.add('completed');
+        } else if (index + 1 === step) {
+            stepEl.classList.add('active');
+        }
+    });
+    
+    currentStep = step;
+    
+    // Load content for step 2
+    if (step === 2 && selectedRole) {
+        loadDocumentUpload();
+    }
+    
+    // Load content for step 3
+    if (step === 3 && selectedRole) {
+        loadAdditionalInfo();
+    }
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Load document upload section
+function loadDocumentUpload() {
+    const uploadArea = document.getElementById('documentUploadArea');
+    if (!uploadArea || !selectedRole) return;
+    
+    const docs = documentRequirements[selectedRole] || [];
+    uploadArea.innerHTML = '';
+    
+    docs.forEach(doc => {
+        const card = document.createElement('div');
+        card.className = 'document-upload-card';
+        card.id = 'upload_' + doc.id;
+        card.innerHTML = `
+            <div class="upload-icon">
+                <i class="fas fa-${doc.icon}"></i>
+            </div>
+            <h5 style="color: white; margin-bottom: 0.5rem;">${doc.name}</h5>
+            <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;">
+                Click to upload or drag and drop<br>
+                <small>PDF, JPG, PNG (Max 5MB)</small>
+            </p>
+            <input type="file" 
+                   class="file-input" 
+                   id="file_${doc.id}" 
+                   accept=".pdf,.jpg,.jpeg,.png"
+                   onchange="handleFileUpload('${doc.id}', this)">
+            <div class="uploaded-file-info" id="info_${doc.id}">
+                <i class="fas fa-check-circle" style="color: #27ae60; margin-right: 8px;"></i>
+                <span id="filename_${doc.id}" style="color: white;"></span>
+                <button type="button" class="remove-file-btn" onclick="removeFile('${doc.id}')">
+                    <i class="fas fa-times"></i> Remove
+                </button>
+            </div>
+        `;
+        
+        card.addEventListener('click', function() {
+            document.getElementById('file_' + doc.id).click();
+        });
+        
+        uploadArea.appendChild(card);
+    });
+    
+    checkDocumentsComplete();
+}
+
+// Handle file upload
+function handleFileUpload(docId, input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        input.value = '';
+        return;
+    }
+    
+    // Store file
+    uploadedDocuments[docId] = file;
+    
+    // Update UI
+    const card = document.getElementById('upload_' + docId);
+    const info = document.getElementById('info_' + docId);
+    const filename = document.getElementById('filename_' + docId);
+    
+    if (card) card.classList.add('uploaded');
+    if (info) info.classList.add('show');
+    if (filename) filename.textContent = file.name;
+    
+    console.log('File uploaded:', docId, file.name);
+    checkDocumentsComplete();
+}
+
+// Remove uploaded file
+function removeFile(docId) {
+    delete uploadedDocuments[docId];
+    
+    const card = document.getElementById('upload_' + docId);
+    const info = document.getElementById('info_' + docId);
+    const input = document.getElementById('file_' + docId);
+    
+    if (card) card.classList.remove('uploaded');
+    if (info) info.classList.remove('show');
+    if (input) input.value = '';
+    
+    console.log('File removed:', docId);
+    checkDocumentsComplete();
+}
+
+// Check if all documents are uploaded
+function checkDocumentsComplete() {
+    if (!selectedRole) return;
+    
+    const required = documentRequirements[selectedRole] || [];
+    const allUploaded = required.every(doc => uploadedDocuments[doc.id]);
+    
+    const nextBtn2 = document.getElementById('nextBtn2');
+    if (nextBtn2) {
+        nextBtn2.disabled = !allUploaded;
+    }
+}
+
+// Load additional information section
+function loadAdditionalInfo() {
+    const infoArea = document.getElementById('additionalInfoArea');
+    if (!infoArea) return;
+    
+    if (selectedRole === 'candidate') {
+        infoArea.innerHTML = `
+            <div class="form-group">
+                <label for="political_party">
+                    <i class="fas fa-flag"></i> Political Party (Optional)
+                </label>
+                <input type="text" id="political_party" name="political_party" 
+                       placeholder="Enter your political party affiliation">
+            </div>
+            
+            <div class="form-group">
+                <label for="campaign_slogan">
+                    <i class="fas fa-bullhorn"></i> Campaign Slogan
+                </label>
+                <input type="text" id="campaign_slogan" name="campaign_slogan" 
+                       placeholder="Enter your campaign slogan" maxlength="200" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="manifesto">
+                    <i class="fas fa-file-alt"></i> Manifesto / Platform
+                </label>
+                <textarea id="manifesto" name="manifesto" 
+                          placeholder="Describe your political manifesto and goals" required></textarea>
+            </div>
+        `;
+    } else {
+        infoArea.innerHTML = `
+            <div class="alert alert-info">
+                <h5><i class="fas fa-info-circle"></i> Final Step</h5>
+                <p>Please review your information and submit your voter registration application.</p>
+                <ul style="text-align: left; margin-top: 1rem;">
+                    <li>Your documents will be reviewed by voter officials</li>
+                    <li>You will be notified of the verification status</li>
+                    <li>Biometric registration will be scheduled upon approval</li>
+                </ul>
+            </div>
+        `;
+    }
+}
+
+// Handle radio button clicks
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Page loaded successfully');
+    
+    // Add event listeners to radio buttons
+    document.querySelectorAll('input[name="new_role"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            selectRoleCard(this.value);
+        });
+    });
+    
+    // Add event listeners to labels
+    document.querySelectorAll('label[for^="radio_"]').forEach(label => {
+        label.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const radioId = this.getAttribute('for');
+            const radio = document.getElementById(radioId);
+            if (radio) {
+                radio.checked = true;
+                selectRoleCard(radio.value);
+            }
+        });
+    });
+});
+
+// Form submission
+document.getElementById('roleApplicationForm')?.addEventListener('submit', function(e) {
+    const selectedRoleInput = document.querySelector('input[name="new_role"]:checked');
+    
+    if (!selectedRoleInput) {
+        e.preventDefault();
+        alert('Please select a role before submitting.');
+        return false;
+    }
+    
+    console.log('Submitting application for role:', selectedRoleInput.value);
+    console.log('Uploaded documents:', Object.keys(uploadedDocuments));
+    
+    // In a real implementation, you would upload files here
+    alert('Application submitted successfully! (File upload would happen here in production)');
+    return true;
+});
+</script>
 {% endblock %}

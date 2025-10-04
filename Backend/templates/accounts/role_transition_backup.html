@@ -1,0 +1,1399 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+<style>
+:root {
+    --primary-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    --secondary-gradient: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    --success-gradient: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    --warning-gradient: linear-gradient(135deg, #e67e22 0%, #f39c12 100%);
+    --danger-gradient: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    --glass-bg: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.15);
+    --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+    --border-radius: 12px;
+    --transition: all 0.3s ease;
+}
+
+body {
+    background: var(--primary-gradient);
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #ecf0f1;
+}
+
+.role-transition-container {
+    padding: 2rem 0;
+    min-height: 100vh;
+}
+
+/* Modern Header */
+.transition-header {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    color: white;
+    text-align: center;
+}
+
+.header-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0;
+}
+
+/* Glass Cards */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    transition: var(--transition);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.glass-card:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+.glass-card-header {
+    background: rgba(52, 152, 219, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 1.5rem;
+    border: none;
+    margin: 0;
+}
+
+.glass-card-body {
+    padding: 2rem;
+    color: white;
+}
+
+/* Current Status */
+.current-status {
+    background: var(--success-gradient);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.current-status::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: rotate(45deg);
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+/* Application Form */
+.application-form {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.form-step {
+    display: none;
+    color: white;
+}
+
+.form-step.active {
+    display: block;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.step {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 1rem;
+    color: white;
+    font-weight: 600;
+    position: relative;
+}
+
+.step.active {
+    background: #3498db;
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.3);
+}
+
+.step.completed {
+    background: #27ae60;
+}
+
+.step::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    width: 2rem;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%);
+}
+
+.step:last-child::after {
+    display: none;
+}
+
+/* Role Selection */
+.role-option {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--glass-border);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+
+.role-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #3498db;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.role-option.selected {
+    border-color: #3498db;
+    background: rgba(52, 152, 219, 0.15);
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.2);
+}
+
+.role-option.selected::before {
+    content: '✓';
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #27ae60;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    z-index: 10;
+    animation: checkmarkPop 0.3s ease-out;
+}
+
+@keyframes checkmarkPop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.role-option {
+    position: relative;
+}
+
+.role-option:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #3498db;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.role-option:active {
+    transform: translateY(0);
+}
+
+.role-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.role-description {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+}
+
+.role-requirements {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.requirement-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.requirement-item i {
+    margin-right: 0.5rem;
+    color: #4facfe;
+}
+
+/* Document Upload */
+.document-upload-area {
+    border: 2px dashed var(--glass-border);
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.document-upload-area:hover {
+    border-color: var(--secondary-gradient);
+    background: rgba(79, 172, 254, 0.1);
+}
+
+.document-upload-area.dragover {
+    border-color: var(--success-gradient);
+    background: rgba(56, 239, 125, 0.1);
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: var(--secondary-gradient);
+    margin-bottom: 1rem;
+}
+
+.uploaded-documents {
+    margin-top: 1rem;
+}
+
+.document-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.document-info {
+    display: flex;
+    align-items: center;
+}
+
+.document-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--secondary-gradient);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    color: white;
+}
+
+.document-details h6 {
+    margin: 0;
+    color: white;
+}
+
+.document-details small {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.remove-document {
+    background: var(--warning-gradient);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.remove-document:hover {
+    transform: scale(1.1);
+}
+
+/* Modern Buttons */
+.btn-modern {
+    background: #3498db;
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: var(--transition);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-light);
+    cursor: pointer;
+}
+
+.btn-modern:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    color: white;
+}
+
+.btn-success-modern {
+    background: #27ae60;
+}
+
+.btn-success-modern:hover {
+    background: #229954;
+}
+
+.btn-warning-modern {
+    background: #e67e22;
+}
+
+.btn-warning-modern:hover {
+    background: #d35400;
+}
+
+.btn-modern:disabled {
+    background: #7f8c8d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-modern:disabled:hover {
+    background: #7f8c8d;
+    transform: none;
+}
+
+/* Progress Bar */
+.progress-container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+}
+
+.progress-bar-custom {
+    background: rgba(255, 255, 255, 0.2);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    background: var(--success-gradient);
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .role-transition-container {
+        padding: 1rem 0;
+    }
+    
+    .glass-card-body,
+    .application-form {
+        padding: 1.5rem;
+    }
+    
+    .header-title {
+        font-size: 2rem;
+    }
+    
+    .step-indicator {
+        margin-bottom: 1rem;
+    }
+    
+    .step {
+        width: 35px;
+        height: 35px;
+        margin: 0 0.5rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="role-transition-container">
+    <div class="container">
+        <!-- Header -->
+        <div class="transition-header animate__animated animate__fadeIn">
+            <h1 class="header-title">
+                <i class="fas fa-arrow-up me-3"></i>Role Transition Application
+            </h1>
+            <p class="header-subtitle">
+                Upgrade your civic participation with proper documentation
+            </p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Current Status -->
+                <div class="current-status animate__animated animate__slideInLeft">
+                    <h5><i class="fas fa-user-check me-2"></i>Current Status</h5>
+                    <div class="status-badge">
+                        <i class="fas fa-{% if user.user_type == 'citizen' %}users{% elif user.user_type == 'voter' %}vote-yea{% else %}user-tie{% endif %} me-2"></i>
+                        {{ user.get_user_type_display }}
+                    </div>
+                    <p class="mt-2 mb-0">
+                        {% if user.user_type == 'citizen' %}
+                            As a citizen, you can apply for voter registration or candidacy with proper documentation.
+                        {% elif user.user_type == 'voter' %}
+                            As a registered voter, you can participate in elections and apply for candidacy.
+                        {% elif user.user_type == 'candidate' %}
+                            As a candidate, you can manage your campaign and participate in elections.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Application Form -->
+                {% if available_roles %}
+                <div class="application-form animate__animated animate__slideInUp">
+                    <form id="roleApplicationForm" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Step Indicator -->
+                        <div class="step-indicator">
+                            <div class="step active" data-step="1">1</div>
+                            <div class="step" data-step="2">2</div>
+                            <div class="step" data-step="3">3</div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="progress-container">
+                            <div class="progress-bar-custom">
+                                <div class="progress-fill" id="progressFill" style="width: 33%"></div>
+                            </div>
+                            <small class="text-light opacity-75">Step <span id="currentStep">1</span> of 3</small>
+                        </div>
+
+                        <!-- Step 1: Role Selection -->
+                        <div class="form-step active" data-step="1">
+                            <h4 class="mb-4">Select Your Desired Role</h4>
+                            {% if available_roles %}
+                                {% for role in available_roles %}
+                                <div class="role-option" data-role="{{ role.role }}" role="button" aria-label="Select {{ role.name }} role">
+                                    <input type="radio" name="new_role" value="{{ role.role }}" id="role_{{ role.role }}" style="display: none;">
+                                    <div class="role-title">
+                                        <i class="fas fa-{% if role.role == 'voter' %}vote-yea{% else %}user-tie{% endif %} me-2"></i>
+                                        {{ role.name }}
+                                    </div>
+                                    <div class="role-description">{{ role.description }}</div>
+                                    <div class="selection-indicator" style="display: none;">
+                                        <i class="fas fa-check-circle text-success"></i> Selected
+                                    </div>
+                                    <div class="role-requirements">
+                                        <h6><i class="fas fa-clipboard-list me-2"></i>Required Documents:</h6>
+                                        {% if role.role == 'voter' %}
+                                            <div class="requirement-item">
+                                                <i class="fas fa-id-card"></i>
+                                                <span>National ID Card or Passport</span>
+                                            </div>
+                                            <div class="requirement-item">
+                                                <i class="fas fa-home"></i>
+                                                <span>Proof of Residence</span>
+                                            </div>
+                                            <div class="requirement-item">
+                                                <i class="fas fa-certificate"></i>
+                                                <span>Birth Certificate</span>
+                                            </div>
+                                        {% elif role.role == 'candidate' %}
+                                            <div class="requirement-item">
+                                                <i class="fas fa-id-card"></i>
+                                                <span>National ID Card or Passport</span>
+                                            </div>
+                                            <div class="requirement-item">
+                                                <i class="fas fa-graduation-cap"></i>
+                                                <span>Educational Certificate</span>
+                                            </div>
+                                            <div class="requirement-item">
+                                                <i class="fas fa-shield-alt"></i>
+                                                <span>Criminal Background Check</span>
+                                            </div>
+                                            <div class="requirement-item">
+                                                <i class="fas fa-receipt"></i>
+                                                <span>Tax Clearance Certificate</span>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>No role transitions available.</strong><br>
+                                    You may have already applied for all available roles or reached the maximum role level.
+                                    <br><br>
+                                    <small class="text-muted">
+                                        <strong>Debug Info:</strong><br>
+                                        Current user type: {{ user.user_type }}<br>
+                                        User ID: {{ user.id }}<br>
+                                        Verification status: {{ user.verification_status|default:'Not set' }}
+                                    </small>
+                                </div>
+                                
+                                <!-- Manual role options for testing -->
+                                <div class="mt-4">
+                                    <h5>Available Role Transitions (Manual Test)</h5>
+                                    {% if user.user_type == 'citizen' %}
+                                        <div class="role-option" data-role="voter" onclick="selectRole('voter')" style="cursor: pointer; border: 2px solid #ccc; padding: 15px; margin: 10px 0; border-radius: 8px; display: flex; align-items: flex-start; gap: 15px;">
+                                            <div class="checkbox-container" style="margin-top: 5px;">
+                                                <input type="radio" name="new_role" value="voter" id="role_voter" onclick="event.stopPropagation(); selectRole('voter')" style="width: 20px; height: 20px; cursor: pointer;">
+                                                <label for="role_voter" onclick="event.stopPropagation(); selectRole('voter')" style="margin-left: 8px; cursor: pointer; color: white; font-weight: bold;">Select</label>
+                                            </div>
+                                            <div class="role-content" style="flex: 1;">
+                                                <div class="role-title">
+                                                    <i class="fas fa-vote-yea me-2"></i>
+                                                    Voter
+                                                </div>
+                                                <div class="role-description">Apply for voter registration</div>
+                                                <div class="selection-indicator" style="display: none;">
+                                                    <i class="fas fa-check-circle text-success"></i> Selected
+                                                </div>
+                                                <div class="role-requirements">
+                                                <h6><i class="fas fa-clipboard-list me-2"></i>Required Documents:</h6>
+                                                <div class="requirement-item">
+                                                    <i class="fas fa-id-card"></i>
+                                                    <span>National ID Card or Passport</span>
+                                                </div>
+                                                <div class="requirement-item">
+                                                    <i class="fas fa-home"></i>
+                                                    <span>Proof of Residence</span>
+                                                </div>
+                                                <div class="requirement-item">
+                                                    <i class="fas fa-certificate"></i>
+                                                    <span>Birth Certificate</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="role-option" data-role="candidate" onclick="selectRole('candidate')" style="cursor: pointer; border: 2px solid #ccc; padding: 15px; margin: 10px 0; border-radius: 8px; display: flex; align-items: flex-start; gap: 15px;">
+                                            <div class="checkbox-container" style="margin-top: 5px;">
+                                                <input type="radio" name="new_role" value="candidate" id="role_candidate" onclick="event.stopPropagation(); selectRole('candidate')" style="width: 20px; height: 20px; cursor: pointer;">
+                                                <label for="role_candidate" onclick="event.stopPropagation(); selectRole('candidate')" style="margin-left: 8px; cursor: pointer; color: white; font-weight: bold;">Select</label>
+                                            </div>
+                                            <div class="role-content" style="flex: 1;">
+                                                <div class="role-title">
+                                                    <i class="fas fa-user-tie me-2"></i>
+                                                    Candidate
+                                                </div>
+                                                <div class="role-description">Apply to run for office</div>
+                                                <div class="selection-indicator" style="display: none;">
+                                                    <i class="fas fa-check-circle text-success"></i> Selected
+                                                </div>
+                                                <div class="role-requirements">
+                                                    <h6><i class="fas fa-clipboard-list me-2"></i>Required Documents:</h6>
+                                                    <div class="requirement-item">
+                                                        <i class="fas fa-id-card"></i>
+                                                        <span>National ID Card or Passport</span>
+                                                    </div>
+                                                    <div class="requirement-item">
+                                                        <i class="fas fa-graduation-cap"></i>
+                                                        <span>Educational Certificate</span>
+                                                    </div>
+                                                    <div class="requirement-item">
+                                                        <i class="fas fa-shield-alt"></i>
+                                                        <span>Criminal Background Check</span>
+                                                    </div>
+                                                    <div class="requirement-item">
+                                                        <i class="fas fa-receipt"></i>
+                                                        <span>Tax Clearance Certificate</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% elif user.user_type == 'voter' %}
+                                        <div class="role-option" data-role="candidate" role="button" aria-label="Select Candidate role">
+                                            <input type="radio" name="new_role" value="candidate" id="role_candidate2" style="display: none;">
+                                            <div class="role-title">
+                                                <i class="fas fa-user-tie me-2"></i>
+                                                Candidate
+                                            </div>
+                                            <div class="role-description">Apply to run for office</div>
+                                            <div class="selection-indicator" style="display: none;">
+                                                <i class="fas fa-check-circle text-success"></i> Selected
+                                            </div>
+                                            <div class="role-requirements">
+                                                <h6><i class="fas fa-clipboard-list me-2"></i>Required Documents:</h6>
+                                                <div class="requirement-item">
+                                                    <i class="fas fa-id-card"></i>
+                                                    <span>National ID Card or Passport</span>
+                                                </div>
+                                                <div class="requirement-item">
+                                                    <i class="fas fa-graduation-cap"></i>
+                                                    <span>Educational Certificate</span>
+                                                </div>
+                                                <div class="requirement-item">
+                                                    <i class="fas fa-shield-alt"></i>
+                                                    <span>Criminal Background Check</span>
+                                                </div>
+                                                <div class="requirement-item">
+                                                    <i class="fas fa-receipt"></i>
+                                                    <span>Tax Clearance Certificate</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Step 2: Document Upload -->
+                        <div class="form-step" data-step="2">
+                            <h4 class="mb-4">Upload Required Documents</h4>
+                            <div id="documentUploadSection">
+                                <!-- Dynamic document upload areas will be inserted here -->
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Additional Information -->
+                        <div class="form-step" data-step="3">
+                            <h4 class="mb-4">Additional Information</h4>
+                            <div id="additionalInfoSection">
+                                <!-- Additional fields for candidate applications -->
+                                <div class="candidate-fields" style="display: none;">
+                                    <div class="mb-3">
+                                        <label class="form-label text-light">Political Party (Optional)</label>
+                                        <input type="text" class="form-control" name="political_party" placeholder="Enter your political party affiliation">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-light">Campaign Slogan</label>
+                                        <input type="text" class="form-control" name="campaign_slogan" placeholder="Enter your campaign slogan" maxlength="200">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-light">Manifesto</label>
+                                        <textarea class="form-control" name="manifesto" rows="5" placeholder="Describe your political manifesto and goals"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Buttons -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn-modern" id="prevBtn" onclick="changeStep(-1)" style="display: none;">
+                                <i class="fas fa-arrow-left"></i>
+                                Previous
+                            </button>
+                            <button type="button" class="btn-modern btn-success-modern" id="nextBtn" onclick="changeStep(1)">
+                                Next
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                            <button type="submit" class="btn-modern btn-warning-modern" id="submitBtn" style="display: none;">
+                                <i class="fas fa-paper-plane"></i>
+                                Submit Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {% else %}
+                <div class="glass-card animate__animated animate__slideInUp">
+                    <div class="glass-card-body text-center">
+                        <i class="fas fa-check-circle text-success fa-4x mb-3"></i>
+                        <h4>No Role Transitions Available</h4>
+                        <p class="text-light opacity-75 mb-4">
+                            You have reached the highest available role or no transitions are currently available for your account.
+                        </p>
+                        <a href="{% url 'accounts:dashboard' %}" class="btn-modern">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="glass-card animate__animated animate__slideInRight">
+                    <div class="glass-card-header">
+                        <h5><i class="fas fa-info-circle me-2"></i>Role Information</h5>
+                    </div>
+                    <div class="glass-card-body">
+                        <div class="role-info mb-4">
+                            <h6><i class="fas fa-users me-2 text-info"></i>Citizen</h6>
+                            <p class="small text-light opacity-75">Basic access to public information and ability to apply for other roles.</p>
+                        </div>
+                        
+                        <div class="role-info mb-4">
+                            <h6><i class="fas fa-vote-yea me-2 text-success"></i>Voter</h6>
+                            <p class="small text-light opacity-75">Can participate in elections, view results, and verify votes on blockchain.</p>
+                        </div>
+                        
+                        <div class="role-info mb-4">
+                            <h6><i class="fas fa-user-tie me-2 text-warning"></i>Candidate</h6>
+                            <p class="small text-light opacity-75">Can run for office, manage campaigns, and access candidate tools.</p>
+                        </div>
+                        
+                        <div class="role-info mb-4">
+                            <h6><i class="fas fa-user-cog me-2 text-primary"></i>Voter Official</h6>
+                            <p class="small text-light opacity-75">Manages voter registrations and biometric verification. (By appointment only)</p>
+                        </div>
+                        
+                        <div class="role-info">
+                            <h6><i class="fas fa-crown me-2 text-danger"></i>Electoral Commission</h6>
+                            <p class="small text-light opacity-75">Oversees elections, approves candidates, and manages the system. (By appointment only)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let currentStep = 1;
+let selectedRole = null;
+let uploadedDocuments = {};
+
+// Define selectRole function BEFORE DOM loads
+function selectRole(role) {
+    console.log('✅ Role selected:', role);
+    
+    // Update selected role
+    selectedRole = role;
+    
+    // Check the corresponding radio button
+    const radioButton = document.getElementById('role_' + role);
+    if (radioButton) {
+        radioButton.checked = true;
+    }
+    
+    // Update visual indicators
+    document.querySelectorAll('.role-option').forEach(option => {
+        option.style.borderColor = '#ccc';
+        option.style.backgroundColor = 'transparent';
+        const indicator = option.querySelector('.selection-indicator');
+        if (indicator) indicator.style.display = 'none';
+    });
+    
+    // Highlight selected option
+    const selectedOption = document.querySelector(`[data-role="${role}"]`);
+    if (selectedOption) {
+        selectedOption.style.borderColor = '#27ae60';
+        selectedOption.style.backgroundColor = 'rgba(39, 174, 96, 0.1)';
+        const indicator = selectedOption.querySelector('.selection-indicator');
+        if (indicator) indicator.style.display = 'block';
+    }
+    
+    // Enable next button
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn) {
+        nextBtn.disabled = false;
+        nextBtn.style.opacity = '1';
+        nextBtn.style.cursor = 'pointer';
+        console.log('✅ Next button enabled');
+    }
+    
+    // Show success notification
+    showNotification(`✓ Selected: ${role.charAt(0).toUpperCase() + role.slice(1)}`, 'success');
+}
+
+// Document requirements for each role
+const documentRequirements = {
+    voter: [
+        { type: 'national_id', name: 'National ID Card', required: true, icon: 'fas fa-id-card' },
+        { type: 'proof_of_residence', name: 'Proof of Residence', required: true, icon: 'fas fa-home' },
+        { type: 'birth_certificate', name: 'Birth Certificate', required: true, icon: 'fas fa-certificate' }
+    ],
+    candidate: [
+        { type: 'national_id', name: 'National ID Card', required: true, icon: 'fas fa-id-card' },
+        { type: 'educational_certificate', name: 'Educational Certificate', required: true, icon: 'fas fa-graduation-cap' },
+        { type: 'criminal_background_check', name: 'Criminal Background Check', required: true, icon: 'fas fa-shield-alt' },
+        { type: 'tax_clearance', name: 'Tax Clearance Certificate', required: true, icon: 'fas fa-receipt' }
+    ]
+};
+
+// Initialize the form
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM loaded, initializing role transition form');
+    
+    // Immediate check without timeout
+    const roleOptions = document.querySelectorAll('.role-option');
+    console.log('📋 Available roles found:', roleOptions.length);
+    
+    if (roleOptions.length === 0) {
+        console.warn('❌ No role options found. Check if available_roles is populated in the template context.');
+        showNotification('No role transitions available at this time. You may have already applied or reached the maximum role level.', 'info');
+        return;
+    }
+    
+    // Debug: Log available roles immediately
+    roleOptions.forEach((option, index) => {
+        const roleTitle = option.querySelector('.role-title');
+        const roleData = option.dataset.role;
+        console.log(`🎯 Role ${index + 1}:`, roleTitle ? roleTitle.textContent.trim() : 'Unknown', 'Data:', roleData);
+        
+        // Add immediate click test
+        option.addEventListener('click', function() {
+            console.log('🖱️ CLICK DETECTED on role:', this.dataset.role);
+            alert('Role clicked: ' + this.dataset.role);
+        });
+    });
+    
+    initializeRoleSelection();
+    initializeFormValidation();
+    
+    console.log('✅ Initialization complete');
+});
+
+// selectRole function already defined at the top of the script
+
+// Role selection functionality
+function initializeRoleSelection() {
+    const roleOptions = document.querySelectorAll('.role-option');
+    const nextBtn = document.getElementById('nextBtn');
+    
+    console.log('Initializing role selection. Found', roleOptions.length, 'role options');
+    console.log('Next button found:', !!nextBtn);
+    
+    if (roleOptions.length === 0) {
+        console.error('No role options found to initialize!');
+        return;
+    }
+    
+    roleOptions.forEach((option, index) => {
+        console.log('Setting up role option', index, '- Role:', option.dataset.role);
+        
+        // Add visual hover effect
+        option.style.cursor = 'pointer';
+        
+        // Multiple event listeners for better compatibility
+        ['click', 'touchstart'].forEach(eventType => {
+            option.addEventListener(eventType, function(e) {
+                e.preventDefault();
+                console.log('Role option clicked/touched:', this.dataset.role);
+                
+                // Remove previous selection
+                document.querySelectorAll('.role-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                    const radio = opt.querySelector('input[type="radio"]');
+                    if (radio) radio.checked = false;
+                    
+                    // Hide selection indicator
+                    const indicator = opt.querySelector('.selection-indicator');
+                    if (indicator) {
+                        indicator.style.display = 'none';
+                    }
+                });
+                
+                // Select current option
+                this.classList.add('selected');
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.checked = true;
+                    selectedRole = radio.value;
+                    console.log('Selected role set to:', selectedRole);
+                    
+                    // Show selection indicator
+                    const indicator = this.querySelector('.selection-indicator');
+                    if (indicator) {
+                        indicator.style.display = 'block';
+                    }
+                    
+                    // Enable next button
+                    if (nextBtn) {
+                        nextBtn.disabled = false;
+                        nextBtn.style.opacity = '1';
+                        nextBtn.style.cursor = 'pointer';
+                        nextBtn.classList.remove('btn-disabled');
+                        console.log('Next button enabled');
+                    }
+                    
+                    const roleTitle = this.querySelector('.role-title');
+                    const roleName = roleTitle ? roleTitle.textContent.trim() : this.dataset.role;
+                    showNotification(`✓ Selected: ${roleName}`, 'success');
+                } else {
+                    console.error('No radio button found in role option:', this);
+                }
+            });
+        });
+        
+        // Add keyboard support
+        option.setAttribute('tabindex', '0');
+        option.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.click();
+            }
+        });
+    });
+    
+    // Initially disable next button
+    if (nextBtn) {
+        nextBtn.disabled = true;
+        nextBtn.style.opacity = '0.6';
+        nextBtn.style.cursor = 'not-allowed';
+        console.log('Next button initially disabled');
+    } else {
+        console.error('Next button not found!');
+    }
+    
+    // Add a test button for debugging
+    console.log('Role selection initialization complete');
+}
+
+// Step navigation
+function changeStep(direction) {
+    console.log('Changing step. Current:', currentStep, 'Direction:', direction, 'Selected role:', selectedRole);
+    
+    if (direction === 1) {
+        // Moving forward
+        if (currentStep === 1 && !selectedRole) {
+            showNotification('Please select a role to continue', 'warning');
+            return;
+        }
+        
+        if (currentStep === 2 && !validateDocuments()) {
+            showNotification('Please upload all required documents', 'warning');
+            return;
+        }
+    }
+    
+    // Validate step bounds
+    const newStep = currentStep + direction;
+    if (newStep < 1 || newStep > 3) {
+        console.log('Invalid step:', newStep);
+        return;
+    }
+    
+    // Hide current step
+    const currentStepElement = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+    const currentStepIndicator = document.querySelector(`.step[data-step="${currentStep}"]`);
+    
+    if (currentStepElement) currentStepElement.classList.remove('active');
+    if (currentStepIndicator) currentStepIndicator.classList.remove('active');
+    
+    // Update step
+    currentStep = newStep;
+    
+    // Show new step
+    const newStepElement = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+    const newStepIndicator = document.querySelector(`.step[data-step="${currentStep}"]`);
+    
+    if (newStepElement) newStepElement.classList.add('active');
+    if (newStepIndicator) newStepIndicator.classList.add('active');
+    
+    // Mark previous steps as completed
+    if (direction === 1 && currentStep > 1) {
+        const prevStepIndicator = document.querySelector(`.step[data-step="${currentStep - 1}"]`);
+        if (prevStepIndicator) prevStepIndicator.classList.add('completed');
+    }
+    
+    // Update progress bar
+    updateProgressBar();
+    
+    // Update buttons
+    updateNavigationButtons();
+    
+    // Load step content
+    if (currentStep === 2) {
+        loadDocumentUploadSection();
+    } else if (currentStep === 3) {
+        loadAdditionalInfoSection();
+    }
+    
+    console.log('Step changed to:', currentStep);
+}
+
+// Update progress bar
+function updateProgressBar() {
+    const progress = (currentStep / 3) * 100;
+    document.getElementById('progressFill').style.width = progress + '%';
+    document.getElementById('currentStep').textContent = currentStep;
+}
+
+// Update navigation buttons
+function updateNavigationButtons() {
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Previous button
+    prevBtn.style.display = currentStep > 1 ? 'inline-flex' : 'none';
+    
+    // Next/Submit buttons
+    if (currentStep === 3) {
+        nextBtn.style.display = 'none';
+        submitBtn.style.display = 'inline-flex';
+    } else {
+        nextBtn.style.display = 'inline-flex';
+        submitBtn.style.display = 'none';
+    }
+}
+
+// Load document upload section
+function loadDocumentUploadSection() {
+    const container = document.getElementById('documentUploadSection');
+    const requirements = documentRequirements[selectedRole] || [];
+    
+    container.innerHTML = '';
+    
+    requirements.forEach(req => {
+        const uploadArea = createDocumentUploadArea(req);
+        container.appendChild(uploadArea);
+    });
+}
+
+// Create document upload area
+function createDocumentUploadArea(requirement) {
+    const div = document.createElement('div');
+    div.className = 'mb-4';
+    div.innerHTML = `
+        <h6 class="text-light mb-3">
+            <i class="${requirement.icon} me-2"></i>
+            ${requirement.name}
+            ${requirement.required ? '<span class="text-danger">*</span>' : ''}
+        </h6>
+        <div class="document-upload-area" data-document-type="${requirement.type}">
+            <div class="upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <h6 class="text-light">Drop your file here or click to browse</h6>
+            <p class="text-light opacity-75 mb-0">Supported formats: PDF, JPG, PNG (Max 5MB)</p>
+            <input type="file" class="d-none" accept=".pdf,.jpg,.jpeg,.png" data-document-type="${requirement.type}">
+        </div>
+        <div class="uploaded-documents" data-document-type="${requirement.type}"></div>
+    `;
+    
+    // Add event listeners
+    const uploadArea = div.querySelector('.document-upload-area');
+    const fileInput = div.querySelector('input[type="file"]');
+    
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', handleDragOver);
+    uploadArea.addEventListener('drop', (e) => handleFileDrop(e, requirement.type));
+    fileInput.addEventListener('change', (e) => handleFileSelect(e, requirement.type));
+    
+    return div;
+}
+
+// File handling functions
+function handleDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('dragover');
+}
+
+function handleFileDrop(e, documentType) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragover');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        handleFileUpload(files[0], documentType);
+    }
+}
+
+function handleFileSelect(e, documentType) {
+    const file = e.target.files[0];
+    if (file) {
+        handleFileUpload(file, documentType);
+    }
+}
+
+function handleFileUpload(file, documentType) {
+    // Validate file
+    if (!validateFile(file)) {
+        return;
+    }
+    
+    // Store file
+    uploadedDocuments[documentType] = file;
+    
+    // Display uploaded file
+    displayUploadedDocument(file, documentType);
+    
+    showNotification(`${file.name} uploaded successfully!`, 'success');
+}
+
+function validateFile(file) {
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    
+    if (file.size > maxSize) {
+        showNotification('File size must be less than 5MB', 'error');
+        return false;
+    }
+    
+    if (!allowedTypes.includes(file.type)) {
+        showNotification('Only PDF, JPG, and PNG files are allowed', 'error');
+        return false;
+    }
+    
+    return true;
+}
+
+function displayUploadedDocument(file, documentType) {
+    const container = document.querySelector(`.uploaded-documents[data-document-type="${documentType}"]`);
+    
+    const documentItem = document.createElement('div');
+    documentItem.className = 'document-item';
+    documentItem.innerHTML = `
+        <div class="document-info">
+            <div class="document-icon">
+                <i class="fas fa-${file.type === 'application/pdf' ? 'file-pdf' : 'file-image'}"></i>
+            </div>
+            <div class="document-details">
+                <h6>${file.name}</h6>
+                <small>${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+            </div>
+        </div>
+        <button type="button" class="remove-document" onclick="removeDocument('${documentType}')">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    container.innerHTML = '';
+    container.appendChild(documentItem);
+}
+
+function removeDocument(documentType) {
+    delete uploadedDocuments[documentType];
+    const container = document.querySelector(`.uploaded-documents[data-document-type="${documentType}"]`);
+    container.innerHTML = '';
+    showNotification('Document removed', 'info');
+}
+
+// Load additional info section
+function loadAdditionalInfoSection() {
+    if (selectedRole === 'candidate') {
+        document.querySelector('.candidate-fields').style.display = 'block';
+    }
+}
+
+// Validate documents
+function validateDocuments() {
+    const requirements = documentRequirements[selectedRole] || [];
+    const requiredDocs = requirements.filter(req => req.required);
+    
+    for (let req of requiredDocs) {
+        if (!uploadedDocuments[req.type]) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+// Form validation
+function initializeFormValidation() {
+    document.getElementById('roleApplicationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+        
+        submitApplication();
+    });
+}
+
+function validateForm() {
+    if (!selectedRole) {
+        showNotification('Please select a role', 'error');
+        return false;
+    }
+    
+    if (!validateDocuments()) {
+        showNotification('Please upload all required documents', 'error');
+        return false;
+    }
+    
+    return true;
+}
+
+// Submit application (placeholder - needs backend implementation)
+function submitApplication() {
+    showNotification('Document upload system implemented! Backend integration needed.', 'info');
+    
+    // This would normally submit to the backend with proper file handling
+    console.log('Selected Role:', selectedRole);
+    console.log('Uploaded Documents:', Object.keys(uploadedDocuments));
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type} notification-toast`;
+    notification.innerHTML = `
+        <i class="fas fa-${getIconForType(type)} me-2"></i>
+        ${message}
+        <button class="btn-close" onclick="this.parentElement.remove()"></button>
+    `;
+    
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        min-width: 300px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 15px;
+        color: white;
+        padding: 1rem;
+        animation: slideInRight 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+}
+
+function getIconForType(type) {
+    const icons = {
+        'success': 'check-circle',
+        'error': 'exclamation-circle',
+        'warning': 'exclamation-triangle',
+        'info': 'info-circle'
+    };
+    return icons[type] || 'info-circle';
+}
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+    
+    .notification-toast .btn-close {
+        background: none;
+        border: none;
+        color: white;
+        opacity: 0.7;
+        font-size: 1.2rem;
+        padding: 0;
+        margin-left: auto;
+    }
+    
+    .notification-toast .btn-close:hover {
+        opacity: 1;
+    }
+    
+    .form-control {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        color: white;
+        padding: 0.75rem 1rem;
+    }
+    
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: var(--secondary-gradient);
+        box-shadow: 0 0 0 0.2rem rgba(79, 172, 254, 0.25);
+        color: white;
+    }
+    
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

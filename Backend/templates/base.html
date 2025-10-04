@@ -21,32 +21,151 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Navigation -->
+    <!-- Enhanced Navigation with Role Switching -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
                 <i class="fas fa-vote-yea"></i>
                 <span>COMITIA</span>
+                {% if user.is_authenticated %}
+                    <div class="current-role-indicator">
+                        {% if user.is_superuser %}
+                            <span class="role-badge superadmin">
+                                <i class="fas fa-crown"></i> Super Admin
+                            </span>
+                        {% elif user.user_type == 'citizen' %}
+                            <span class="role-badge citizen">
+                                <i class="fas fa-user"></i> Citizen
+                            </span>
+                        {% elif user.user_type == 'voter' %}
+                            <span class="role-badge voter">
+                                <i class="fas fa-vote-yea"></i> Voter
+                            </span>
+                        {% elif user.user_type == 'candidate' %}
+                            <span class="role-badge candidate">
+                                <i class="fas fa-user-tie"></i> Candidate
+                            </span>
+                        {% elif user.user_type == 'voter_official' %}
+                            <span class="role-badge official">
+                                <i class="fas fa-user-shield"></i> Voter Official
+                            </span>
+                        {% elif user.user_type == 'electoral_commission' %}
+                            <span class="role-badge commission">
+                                <i class="fas fa-landmark"></i> Electoral Commission
+                            </span>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
             
             <div class="nav-menu">
                 {% if user.is_authenticated %}
+                    <!-- Role Switcher for Superadmin -->
+                    {% if user.is_superuser or user.is_staff %}
+                        <div class="role-switcher-nav">
+                            <button class="role-switcher-btn" onclick="toggleRoleSwitcher()">
+                                <i class="fas fa-exchange-alt"></i>
+                                <span>Switch Role</span>
+                                <i class="fas fa-chevron-down" id="roleSwitcherIcon"></i>
+                            </button>
+                            <div class="role-switcher-dropdown" id="roleSwitcherDropdown">
+                                <div class="role-switcher-header">
+                                    <i class="fas fa-crown"></i>
+                                    <span>Admin Dashboard Access</span>
+                                </div>
+                                
+                                <a href="{% url 'accounts:superadmin_dashboard' %}" class="role-switcher-item {% if request.resolver_match.url_name == 'superadmin_dashboard' %}active{% endif %}">
+                                    <div class="role-icon superadmin">
+                                        <i class="fas fa-crown"></i>
+                                    </div>
+                                    <div class="role-info">
+                                        <div class="role-name">Super Admin</div>
+                                        <div class="role-desc">System Control</div>
+                                    </div>
+                                </a>
+                                
+                                <a href="{% url 'accounts:citizen_dashboard' %}" class="role-switcher-item {% if request.resolver_match.url_name == 'citizen_dashboard' %}active{% endif %}">
+                                    <div class="role-icon citizen">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="role-info">
+                                        <div class="role-name">Citizen</div>
+                                        <div class="role-desc">Basic User</div>
+                                    </div>
+                                </a>
+                                
+                                <a href="{% url 'accounts:voter_dashboard' %}" class="role-switcher-item {% if request.resolver_match.url_name == 'voter_dashboard' %}active{% endif %}">
+                                    <div class="role-icon voter">
+                                        <i class="fas fa-vote-yea"></i>
+                                    </div>
+                                    <div class="role-info">
+                                        <div class="role-name">Voter</div>
+                                        <div class="role-desc">Vote in Elections</div>
+                                    </div>
+                                </a>
+                                
+                                <a href="{% url 'accounts:candidate_dashboard' %}" class="role-switcher-item {% if request.resolver_match.url_name == 'candidate_dashboard' %}active{% endif %}">
+                                    <div class="role-icon candidate">
+                                        <i class="fas fa-user-tie"></i>
+                                    </div>
+                                    <div class="role-info">
+                                        <div class="role-name">Candidate</div>
+                                        <div class="role-desc">Run for Office</div>
+                                    </div>
+                                </a>
+                                
+                                <a href="{% url 'accounts:voter_official_dashboard' %}" class="role-switcher-item {% if request.resolver_match.url_name == 'voter_official_dashboard' %}active{% endif %}">
+                                    <div class="role-icon official">
+                                        <i class="fas fa-user-shield"></i>
+                                    </div>
+                                    <div class="role-info">
+                                        <div class="role-name">Voter Official</div>
+                                        <div class="role-desc">Verify Voters</div>
+                                    </div>
+                                </a>
+                                
+                                <a href="{% url 'accounts:electoral_commission_dashboard' %}" class="role-switcher-item {% if request.resolver_match.url_name == 'electoral_commission_dashboard' %}active{% endif %}">
+                                    <div class="role-icon commission">
+                                        <i class="fas fa-landmark"></i>
+                                    </div>
+                                    <div class="role-info">
+                                        <div class="role-name">Electoral Commission</div>
+                                        <div class="role-desc">Oversee Elections</div>
+                                    </div>
+                                </a>
+                                
+                                <div class="role-switcher-footer">
+                                    <a href="{% url 'accounts:role_login' %}" class="role-login-link">
+                                        <i class="fas fa-sign-in-alt"></i>
+                                        Role-Based Login
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
                     <!-- Authenticated User Navigation -->
                     <div class="nav-user">
-                        <span class="user-welcome">Welcome, {{ user.first_name }}!</span>
+                        <span class="user-welcome">Welcome, {{ user.first_name|default:user.username }}!</span>
                         <div class="user-dropdown">
-                            <button class="user-btn">
+                            <button class="user-btn" onclick="toggleUserDropdown()">
                                 <i class="fas fa-user"></i>
-                                {{ user.get_full_name }}
-                                <i class="fas fa-chevron-down"></i>
+                                {{ user.get_full_name|default:user.username }}
+                                <i class="fas fa-chevron-down" id="userDropdownIcon"></i>
                             </button>
-                            <div class="dropdown-content">
+                            <div class="dropdown-content" id="userDropdownContent">
                                 <a href="{% url 'accounts:profile' %}">
                                     <i class="fas fa-user-circle"></i> Profile
                                 </a>
                                 <a href="{% url 'accounts:dashboard' %}">
                                     <i class="fas fa-tachometer-alt"></i> Dashboard
                                 </a>
+                                {% if user.is_superuser or user.is_staff %}
+                                    <div class="dropdown-divider"></div>
+                                    <a href="/admin/">
+                                        <i class="fas fa-cogs"></i> Django Admin
+                                    </a>
+                                {% endif %}
                                 <div class="dropdown-divider"></div>
                                 <a href="{% url 'accounts:logout' %}">
                                     <i class="fas fa-sign-out-alt"></i> Logout
@@ -119,8 +238,424 @@
         </div>
     </footer>
 
+    <!-- Enhanced Header Styles -->
+    <style>
+    /* Enhanced Navigation Styles */
+    .navbar {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1rem 0;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .nav-brand i {
+        color: #e94560;
+        font-size: 2rem;
+    }
+
+    /* Current Role Indicator */
+    .current-role-indicator {
+        margin-left: 1rem;
+    }
+
+    .role-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .role-badge.superadmin { background: linear-gradient(135deg, #e94560, #ff6b6b); }
+    .role-badge.citizen { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .role-badge.voter { background: linear-gradient(135deg, #11998e, #38ef7d); }
+    .role-badge.candidate { background: linear-gradient(135deg, #f093fb, #f5576c); }
+    .role-badge.official { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+    .role-badge.commission { background: linear-gradient(135deg, #fa709a, #fee140); }
+
+    /* Role Switcher in Navigation */
+    .role-switcher-nav {
+        position: relative;
+        margin-right: 2rem;
+    }
+
+    .role-switcher-btn {
+        background: rgba(233, 69, 96, 0.2);
+        border: 1px solid rgba(233, 69, 96, 0.5);
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .role-switcher-btn:hover {
+        background: rgba(233, 69, 96, 0.3);
+        border-color: #e94560;
+    }
+
+    .role-switcher-dropdown {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        background: rgba(26, 26, 46, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        min-width: 300px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        z-index: 1001;
+    }
+
+    .role-switcher-dropdown.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .role-switcher-header {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .role-switcher-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 1rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-left: 3px solid transparent;
+    }
+
+    .role-switcher-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-left-color: #e94560;
+    }
+
+    .role-switcher-item.active {
+        background: rgba(233, 69, 96, 0.2);
+        color: white;
+        border-left-color: #e94560;
+    }
+
+    .role-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        color: white;
+    }
+
+    .role-icon.superadmin { background: linear-gradient(135deg, #e94560, #ff6b6b); }
+    .role-icon.citizen { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .role-icon.voter { background: linear-gradient(135deg, #11998e, #38ef7d); }
+    .role-icon.candidate { background: linear-gradient(135deg, #f093fb, #f5576c); }
+    .role-icon.official { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+    .role-icon.commission { background: linear-gradient(135deg, #fa709a, #fee140); }
+
+    .role-info {
+        flex: 1;
+    }
+
+    .role-name {
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+
+    .role-desc {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .role-switcher-footer {
+        padding: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .role-login-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+
+    .role-login-link:hover {
+        color: #e94560;
+    }
+
+    /* User Navigation */
+    .nav-menu {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .user-welcome {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+    }
+
+    .user-dropdown {
+        position: relative;
+    }
+
+    .user-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .user-btn:hover {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .dropdown-content {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        background: rgba(26, 26, 46, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        min-width: 200px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        z-index: 1001;
+    }
+
+    .dropdown-content.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .dropdown-content a {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .dropdown-content a:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+        margin: 0.5rem 0;
+    }
+
+    /* Public Navigation */
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .nav-link {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .nav-link:hover {
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-link.btn-primary {
+        background: #e94560;
+        color: white;
+    }
+
+    .nav-link.btn-primary:hover {
+        background: #d63850;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .nav-container {
+            padding: 0 1rem;
+        }
+        
+        .current-role-indicator {
+            display: none;
+        }
+        
+        .user-welcome {
+            display: none;
+        }
+        
+        .role-switcher-btn span {
+            display: none;
+        }
+        
+        .role-switcher-dropdown,
+        .dropdown-content {
+            min-width: 250px;
+            right: -10px;
+        }
+    }
+    </style>
+
     <!-- JavaScript -->
     <script src="{% static 'js/main.js' %}"></script>
+    
+    <!-- Enhanced Header JavaScript -->
+    <script>
+    // Role Switcher Toggle
+    function toggleRoleSwitcher() {
+        const dropdown = document.getElementById('roleSwitcherDropdown');
+        const icon = document.getElementById('roleSwitcherIcon');
+        
+        // Close user dropdown if open
+        const userDropdown = document.getElementById('userDropdownContent');
+        if (userDropdown && userDropdown.classList.contains('show')) {
+            toggleUserDropdown();
+        }
+        
+        dropdown.classList.toggle('show');
+        
+        if (dropdown.classList.contains('show')) {
+            icon.style.transform = 'rotate(180deg)';
+        } else {
+            icon.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // User Dropdown Toggle
+    function toggleUserDropdown() {
+        const dropdown = document.getElementById('userDropdownContent');
+        const icon = document.getElementById('userDropdownIcon');
+        
+        // Close role switcher if open
+        const roleSwitcher = document.getElementById('roleSwitcherDropdown');
+        if (roleSwitcher && roleSwitcher.classList.contains('show')) {
+            toggleRoleSwitcher();
+        }
+        
+        dropdown.classList.toggle('show');
+        
+        if (dropdown.classList.contains('show')) {
+            icon.style.transform = 'rotate(180deg)';
+        } else {
+            icon.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(event) {
+        const roleSwitcher = document.querySelector('.role-switcher-nav');
+        const userDropdown = document.querySelector('.user-dropdown');
+        
+        if (roleSwitcher && !roleSwitcher.contains(event.target)) {
+            const dropdown = document.getElementById('roleSwitcherDropdown');
+            const icon = document.getElementById('roleSwitcherIcon');
+            if (dropdown && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+                if (icon) icon.style.transform = 'rotate(0deg)';
+            }
+        }
+        
+        if (userDropdown && !userDropdown.contains(event.target)) {
+            const dropdown = document.getElementById('userDropdownContent');
+            const icon = document.getElementById('userDropdownIcon');
+            if (dropdown && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+                if (icon) icon.style.transform = 'rotate(0deg)';
+            }
+        }
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Alt + R to toggle role switcher
+        if (e.altKey && e.key === 'r') {
+            e.preventDefault();
+            const roleSwitcherBtn = document.querySelector('.role-switcher-btn');
+            if (roleSwitcherBtn) {
+                toggleRoleSwitcher();
+            }
+        }
+        
+        // Alt + U to toggle user dropdown
+        if (e.altKey && e.key === 'u') {
+            e.preventDefault();
+            const userBtn = document.querySelector('.user-btn');
+            if (userBtn) {
+                toggleUserDropdown();
+            }
+        }
+    });
+
+    console.log('Enhanced header loaded - Alt+R for role switcher, Alt+U for user menu');
+    </script>
+    
     {% block extra_js %}{% endblock %}
     
     <!-- CSRF Token for AJAX requests -->
